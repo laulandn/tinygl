@@ -1,0 +1,8 @@
+
+all:
+	make -i -C raw -fMakefile.r68
+	make -i -C sdl -fMakefile.r68
+	
+clean:
+	make -i -C raw -fMakefile.r68 clean
+	make -i -C sdl -fMakefile.r68 clean

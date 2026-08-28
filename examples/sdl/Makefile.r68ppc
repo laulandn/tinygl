@@ -1,0 +1,44 @@
+
+#CC = m68k-apple-macos-gcc
+#CXX = m68k-apple-macos-gcc
+CC = powerpc-apple-macos-gcc
+CXX = powerpc-apple-macos-gcc
+
+
+#CFLAGS=-I../../include -I.. -I/opt/local/include/SDL2 -I../../../stb
+CFLAGS=-I../../include -I.. -I../../stb -I$(HOME)/Retro68-build/toolchain/powerpc-apple-macos/include/SDL2 -DSTBI_NO_THREAD_LOCALS
+
+#LDFLAGS=-L../../lib -lTinyGL -L/opt/local/lib -lSDL2
+LDFLAGS= $(HOME)/sdl2macos9/SDL-main/src/main/macosclassic/SDL_main.o  -lSDL2 $(HOME)/sdl2macos9/macos8addons/libmacos8addons.a -lInputSprocketLib -lThreadsLib -lm  
+
+
+all:	gears game hello model texture
+
+gears:	gears.o
+	$(CC)  -o gears gears.o ../../src/*.o $(LDFLAGS)
+#$(HOME)/sdl2macos9/bin2app.sh gears
+	$(HOME)/sdl2macos9/xcoff2app.sh gears
+	
+game:	game.o
+	$(CC)  -o game game.o ../../src/*.o $(LDFLAGS)
+#$(HOME)/sdl2macos9/bin2app.sh gears
+	$(HOME)/sdl2macos9/xcoff2app.sh game
+
+hello:	hello.o
+	$(CC)  -o hello hello.o ../../src/*.o $(LDFLAGS)
+#	$(HOME)/sdl2macos9/bin2app.sh hello
+	$(HOME)/sdl2macos9/xcoff2app.sh hello
+
+model:	model.o
+	$(CC)  -o model model.o ../../src/*.o $(LDFLAGS)
+#	$(HOME)/sdl2macos9/bin2app.sh model
+	$(HOME)/sdl2macos9/xcoff2app.sh model
+
+texture:	texture.o
+	$(CC)  -o texture texture.o ../../src/*.o $(LDFLAGS)
+#	$(HOME)/sdl2macos9/bin2app.sh texture
+	$(HOME)/sdl2macos9/xcoff2app.sh texture
+
+clean:
+	rm -rf game hello gears model texture *.o *.APPL *.bin *.gdb *.dsk *.pef
+
