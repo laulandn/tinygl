@@ -1,8 +1,53 @@
 
-all:
-	make -i -C raw -fMakefile.r68
-	make -i -C sdl -fMakefile.r68
+CC=m68k-apple-macos-gcc
+CXX=m68k-apple-macos-g++
+
+
+CFLAGS=-I../include -I.. -I$(HOME)/Retro68-build/toolchain/m68k-apple-macos/include/SDL2 -DSTBI_NO_THREAD_LOCALS
+#CFLAGS=-I../../include -I.. -I/opt/local/include/SDL2 -I../../../stb
+
+LDFLAGS= $(HOME)/sdl2macos9/SDL-main/src/main/macosclassic/SDL_main.o  -lSDL2  $(HOME)/sdl2macos9/macos8addons/libmacos8addons.a -lInputSprocketLib -L..
+#LDFLAGS=-L../../lib -lTinyGL -L/opt/local/lib -lSDL2
+
+SDLMAIN=$(HOME)/SDL-1.2-main/obj/SDL_main.c.o
+
+
+%.o : %.c
+#echo Compiling $<
+	$(CC) -o $@ -c $< $(CFLAGS)
 	
+
+all:	bounce cube gears mech morph3d spin teapot
+
+bounce:	bounce.o ui_sdl2.o
+	$(CC)  -o bounce.code.bin bounce.o $(LDFLAGS) ui_sdl2.o -lglu -lTinyGL -lm
+	$(HOME)/sdl2macos9/bin2app.sh bounce
+
+cube:	cube.o
+	$(CC)  -o cube.code.bin cube.o $(LDFLAGS) ui_sdl2.o -lglu -lTinyGL -lm
+	$(HOME)/sdl2macos9/bin2app.sh cube
+
+gears:	gears.o
+	$(CC)  -o gears.code.bin gears.o $(LDFLAGS) ui_sdl2.o -lglu -lTinyGL -lm
+	$(HOME)/sdl2macos9/bin2app.sh gears
+
+mech:	mech.o
+	$(CC)  -o mech.code.bin mech.o $(LDFLAGS) ui_sdl2.o -lglu -lTinyGL -lm
+	$(HOME)/sdl2macos9/bin2app.sh mech
+
+morph3d:	morph3d.o
+	$(CC)  -o morph3d.code.bin morph3d.o $(LDFLAGS) ui_sdl2.o -lglu -lTinyGL -lm
+	$(HOME)/sdl2macos9/bin2app.sh morph3d
+
+spin:	spin.o
+	$(CC)  -o spin.code.bin spin.o $(LDFLAGS) ui_sdl2.o -lglu -lTinyGL -lm
+	$(HOME)/sdl2macos9/bin2app.sh spin
+
+teapot:	teapot.o
+	$(CC)  -o teapot.code.bin teapot.o $(LDFLAGS) ui_sdl2.o -lglu -lTinyGL -lm
+	$(HOME)/sdl2macos9/bin2app.sh teapot
+
+
 clean:
-	make -i -C raw -fMakefile.r68 clean
-	make -i -C sdl -fMakefile.r68 clean
+	rm -rf bounce cube gears mech morph3d spin teapot *.o *.APPL *.bin *.gdb *.dsk *.pef
+

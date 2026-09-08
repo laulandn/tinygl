@@ -1,53 +1,33 @@
-# Configuration options:
-#   ENABLE_SDL2=0/1 - Toggle SDL2 examples (auto-detected)
-#   DEBUG=1         - Debug build with symbols
-#   SANITIZE=1      - Enable address/undefined sanitizers
-#   V=1             - Verbose output
+include config.mk.r68
 
-# Default target (must be before includes that define targets)
-.DEFAULT_GOAL := all
+all:
+#	( for f in $(DIRS); do ( cd $$f ; make -f Makefile.r68 all ) || exit 1 ; done )
+	make  -C source -f Makefile.r68
+	make  -C agl-mini -f Makefile.r68
+	make  -C GLUT_apple -f Makefile.r68
+	cp */*.a .
+	make  -C examples -f Makefile.r68
+	$(AR) rcv libOpenGLLibrary.a source/*.o agl-mini/*.o
+	$(RANLIB) libOpenGLLibrary.a
+	$(AR) rcv libOpenGLUtility.a src-glu/*.o
+	$(RANLIB) libOpenGLUtility.a
 
-# Include modular build components
-include mk/common.mk.r68
-include mk/src.mk.r68
-include mk/examples.mk.r68
-include mk/test.mk.r68
+install:
+	make -f Makefile.r68 all
+	cp *.a $(HOME)/Retro68-build/toolchain/m68k-apple-macos/lib/.
+	
+clean:
+	rm -f *~ lib/libTinyGL.a include/GL/*~ TAGS
+#	( for f in $(DIRS); do ( cd $$f ; make -f Makefile.r68 clean ; ) done )
+	make  -C source -f Makefile.r68 clean
+	make  -C examples -f Makefile.r68 clean
+	make  -C agl-mini -f Makefile.r68 clean
+	make  -C GLUT_apple -f Makefile.r68 clean
+	rm -rf *.a
 
-# Main targets
-all: $(LIB)
-	@echo Done!
-
-# Build SDL examples
-sdl_examples: $(LIB) examples/stb_image.h $(SDL_EXAMPLES)
-
-# Build raw examples
-raw_examples: $(LIB) examples/stb_image_write.h $(RAW_EXAMPLES)
+install:
+#	( for f in $(DIRS); do ( cd $$f ; make -f Makefile.r68 install ; ) done )
 
 
-# Clean all build artifacts
-clean: clean-lib clean-examples
-	$(VECHO) "  CLEAN"
-	$(Q)$(RM) -r $(LIB_DIR)
-
-# Download external dependencies
-examples/stb_image.h:
-	curl -o $@ https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
-examples/stb_image_write.h:
-	curl -o $@ https://raw.githubusercontent.com/nothings/stb/master/stb_image_write.h
-
-# Clean everything including generated assets
-distclean: clean
-	$(VECHO) "  DISTCLEAN"
-	$(Q)$(RM) examples/stb_image.h examples/stb_image_write.h
-
-# Show configuration
-config:
-	@echo "TinyGL build configuration:"
-	@echo "  Platform:    $(UNAME_S)"
-	@echo "  Compiler:    $(CC)"
-	@echo "  CFLAGS:      $(CFLAGS)"
-	@echo "  LDFLAGS:     $(LDFLAGS)"
-	@echo "  SDL2:        $(if $(filter 1,$(ENABLE_SDL2)),enabled,disabled)"
-	@echo "  Examples:    $(ALL_EXAMPLE_NAMES)"
-
-.PHONY: all sdl_examples raw_examples check check-generate clean distclean config $(ALL_EXAMPLES)
+tar:
+#	( cd .. ; tar zcvf /tmp/TinyGL-0.4.1.tar.gz TinyGL --exclude .svn --exclude TAGS )

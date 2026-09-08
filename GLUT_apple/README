@@ -1,0 +1,115 @@
+
+This directory and its subdirectories contains the OpenGL Utility
+Toolkit (GLUT) distribution.  See the NOTICE for legal terms.
+
+VERSION:
+
+Release 3.2, November 26, 1996.
+
+SUPPORTED MACHINES:
+
+This distribution should compile for:
+
+  o  DEC Alpha workstation running OSF/1 and OpenVMS with Open3D
+     layered product.
+
+  o  IBM RS/6000 workstations running AIX with OpenGL support.
+
+  o  Metro Link's Metro OpenGL for Linux.
+
+  o  SGI workstation running IRIX 5.2 or higher supporting OpenGL,
+     including 64-bit and N32 support IRIX 6.1 and 6.2.
+
+  o  Template Graphics Software's OpenGL for Sun workstations.
+
+  o  Mesa 1.2 (and 1.1) for Unix workstations, including Linux PCs
+     and SunOS 4.1.x.
+
+MAKEFILE GENERATION TO BUILD GLUT:     <-- IMPORTANT!
+
+Use mkmkfiles.sgi to put Makefiles using the SGI Makefile conventions
+in place.  Use mkmkfiles.imake to put Makefiles generated from
+Imakefiles in place.  Run one of these two commands in this directory,
+then do a "make".
+
+FREQUENTLY ASKED QUESTIONS ABOUT GLUT:
+
+See FAQ.glut
+
+CONTENTS OVERVIEW BY DIRECTORY:
+
+  GL - GLUT interface header files
+
+  lib - source code for GLUT libraries
+
+     glut - GLUT library implementation
+
+     fglut - GLUT FORTRAN bindings.
+
+     glut.n32 - IRIX 6.2 "N32" version of the GLUT library.
+
+     fglut.n32 - IRIX 6.2 "N32" version of the GLUT library.
+
+     glut.n64 - 64-bit version of the GLUT library.
+
+     fglut.n64 - 64-bit version of the GLUT library.
+
+  test - test programs for GLUT library
+
+  progs - programs using GLUT
+
+     examples - misc. GLUT examples
+
+     redbook - examples from the OpenGL Programming Guide ported to GLUT
+
+     contrib - contributed GLUT examples
+
+     demos - more involved OpenGL demos using GLUT
+
+     fortran - GLUT FORTRAN examples
+
+DOCUMENTATION:
+
+See the other README files in this directory.  There is a complete
+specification for GLUT API version 3 in PostScript available by
+anonymous ftp accompanying this distribution.
+
+TWO SHAMELESS BUT HOPEFULLY HELPFUL PLUGS:
+
+Since November 1994, The X Journal carries a column on OpenGL that I
+write.  Each column uses GLUT for the examples.  If you are looking to
+learn about OpenGL, this may be a good place.  The X Journal (ISSN
+1056-7003) is published six times per year, bimonthly by SIGS
+Publications, 71 West 23rd St, 3rd floor, NY, NY 10010, 212-242-7447.
+Subscription rates - one year (six issues) individual:  $39 domestic;
+$64 Canada and Mexico; $79 foreign; institutional: $99 domestic; $124
+Canada and Mexico; $139 foreign.  Send address changes and subscription
+orders to:  The X Journal, PO Box 5050, Brentwood, TN 37024-5050.  For
+service on current subscriptions, call 800-361-1279(v); or
+215-785-6073(f); or subscriptions@sigs.com (email).
+
+I've written a book titled "Programming OpenGL for the X Window System"
+(ISBN: 0-201-48359-9) published by Addison-Wesley.  It includes both a
+complete tutorial and documentation for GLUT, as well as a full
+explanation of using OpenGL with the X Window System's Xlib and
+Xt/Motif interfaces.  If you use GLUT, I believe you'll find this
+book very informative.
+
+BUG REPORTING:
+
+Send bug reports by electronic mail to mjk@sgi.com
+
+Questions of a general interest about GLUT will be answered on the
+comp.graphics.api.opengl newsgroup.
+
+ACKNOWLEDGEMENTS:
+
+Much thanks to OpenGL engineers at DEC, IBM, Metro Link, Microsoft,
+SGI, Sun, and TGS as well as Brian Paul from the University of
+Wisconsin and Nate Robbins at the Univeristy of Utah for helping me
+ensure the portability of this code to non-SGI graphics platforms.
+Also thank you to GLUT users who supplied me with feedback and bug
+fixes.
+
+- Mark Kilgard
+  mjk@sgi.com

@@ -1,7 +1,10 @@
-Work in progress for building with Retro68.
+This is a port to classic MacOS 7/8/9, using Retro68.
 
-Proof of concept works with SDL2 built with no OpenGL support, both ppc and m68k.
+Some functions TinyGL did not include have been added as hacks.
 
-Will need non-AGL driver for SDL2.
+Some functionality that TinyGL artificially limited, has been hacked around.
 
-AGL is unfinished.
+A semi-functional AGL has been added.
+
+It has been tested and works with SDL2.
+

@@ -1,0 +1,1 @@
+This is taken from one of Apple's ppc OpenGL SDKs, but works well.
