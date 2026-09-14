@@ -9,7 +9,8 @@ RANLIB=m68k-apple-macos-ranlib
 #AR=powerpc-apple-macos-ar
 #RANLIB=powerpc-apple-macos-ranlib
 
-CFLAGS= -I../include/GL -Dmacintosh
+#CFLAGS= -I../include/GL -Dmacintosh
+CFLAGS= -I$(HOME)/Retro68-build/toolchain/m68k-apple-macos/include/GL -Dmacintosh
 
 OBJS=$(subst .c,.o,$(wildcard *.c))
 

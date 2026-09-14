@@ -13,6 +13,7 @@
 
 static int num_contexts = 0;
 
+
 /* create offscreen tinygl context with provided dimensions and depth */
 ostgl_context_t *ostgl_create_context(int width, int height, int depth)
 {

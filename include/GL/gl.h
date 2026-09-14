@@ -856,6 +856,18 @@ inline void glPolygonStipple(void*) {}
 inline void glTexParameterf(int, int, int) {};
 */
 
+/* "new" may or may not be implemented */
+void glPushAttrib(int v);
+void glPopAttrib();
+void glEvalMesh2( GLenum mode, GLint i1, GLint i2, GLint j1, GLint j2 );
+void glMapGrid2f( GLint un, GLfloat u1, GLfloat u2,
+			 GLint vn, GLfloat v1, GLfloat v2 );
+void glMap2f( GLenum target,
+		     GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
+		     GLfloat v1, GLfloat v2, GLint vstride, GLint vorder,
+		     const GLfloat *points );
+
+
 /* non compatible functions */
 void glDebug(int mode);
 void glInit(void *zbuffer);

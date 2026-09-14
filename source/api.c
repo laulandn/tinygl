@@ -104,6 +104,12 @@ void glColor3f(float x,float y,float z)
   glColor4f(x,y,z,1);
 }
 
+
+void glColor3d(double x,double y,double z) 
+{
+  glColor4f(x,y,z,1);
+}
+
 void glColor3fv(float *v) 
 {
   glColor4f(v[0],v[1],v[2],1);

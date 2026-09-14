@@ -1,0 +1,53 @@
+
+CC=m68k-apple-macos-gcc
+CXX=m68k-apple-macos-g++
+
+
+CFLAGS=-I../include -I.. -I$(HOME)/Retro68-build/toolchain/m68k-apple-macos/include/SDL3 -DSTBI_NO_THREAD_LOCALS
+#CFLAGS=-I../../include -I.. -I/opt/local/include/SDL3 -I../../../stb
+
+SDLMAIN=
+LDFLAGS= -L.. -lSDL3 $(HOME)/sdl3macos9/macos8addons/libmacos8addons.a -lglu -lTinyGL -lm 
+#LDFLAGS=-L../../lib -lTinyGL -L/opt/local/lib -lSDL3
+
+
+
+%.o : %.c
+#echo Compiling $<
+	$(CC) -o $@ -c $< $(CFLAGS)
+	
+
+all:	bounce cube gears mech morph3d spin teapot
+
+bounce:	bounce.o ui_sdl3.o
+	$(CC) -o bounce.code.bin bounce.o ui_sdl3.o $(LDFLAGS)
+	$(HOME)/sdl3macos9/bin2app.sh bounce
+
+cube:	cube.o
+	$(CC)  -o cube.code.bin cube.o ui_sdl3.o $(LDFLAGS)
+	$(HOME)/sdl3macos9/bin2app.sh cube
+
+gears:	gears.o
+	$(CC)  -o gears.code.bin gears.o ui_sdl3.o $(LDFLAGS)
+	$(HOME)/sdl3macos9/bin2app.sh gears
+
+mech:	mech.o
+	$(CC)  -o mech.code.bin mech.o ui_sdl3.o $(LDFLAGS)
+	$(HOME)/sdl3macos9/bin2app.sh mech
+
+morph3d:	morph3d.o
+	$(CC)  -o morph3d.code.bin morph3d.o ui_sdl3.o $(LDFLAGS)
+	$(HOME)/sdl3macos9/bin2app.sh morph3d
+
+spin:	spin.o
+	$(CC)  -o spin.code.bin spin.o ui_sdl3.o $(LDFLAGS)
+	$(HOME)/sdl3macos9/bin2app.sh spin
+
+teapot:	teapot.o
+	$(CC)  -o teapot.code.bin teapot.o ui_sdl3.o $(LDFLAGS)
+	$(HOME)/sdl3macos9/bin2app.sh teapot
+
+
+clean:
+	rm -rf bounce cube gears mech morph3d spin teapot *.o *.APPL *.bin *.gdb *.dsk *.pef
+

@@ -14,6 +14,7 @@ all:
 
 install:
 	make -f Makefile.r68 all
+	# NOTE: Do NOT copy the include files!
 	cp *.a $(HOME)/Retro68-build/toolchain/m68k-apple-macos/lib/.
 	
 clean:

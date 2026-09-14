@@ -1,4 +1,5 @@
 #include "zgl.h"
+#include "GL/ostinygl.h"
 
 
 /* For now... */
@@ -24,6 +25,10 @@ typedef float		GLclampf;	/* single precision float in [0,1] */
 }*/
 
 
+// NOTE: Some of the below may be LIES!
+// This was taken from a different version of TinyGL and may NOT be applicable here.
+// For example, we do NOT support blend.
+// TODO: Fix this to be correct at some point...
 /* clang-format off */
 const GLubyte *license_string =
     (const GLubyte *) ""; /* will be generated automatically */
@@ -249,6 +254,12 @@ void glBlendFunc(GLenum sfactor, GLenum dfactor)
 }
 
 
+void glBlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
+{
+  fprintf(stderr,"glBlendFuncSeparate...not implemented\n"); fflush(stderr);
+}
+
+
 void glBlendEquation(GLenum mode)
 {
     //GLContext *c = gl_get_context();
@@ -436,7 +447,7 @@ void glPushAttrib(int v)
 }
 
 
-void glPopAttrib(int v)
+void glPopAttrib()
 {
   // TODO really should implement this...
 }
@@ -463,19 +474,6 @@ int glLockArraysEXT(void)
 }
 
 
-void glBlendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha)
-{
-  fprintf(stderr,"glBlendFuncSeparate...not implemented\n"); fflush(stderr);
-}
-
-
-/*void glBlendEquation(GLenum mode)
-{
-  fprintf(stderr,"glBlendEquation...not implemented\n"); fflush(stderr);
-}
-*/
-
-
 void glGetIntegerv2( GLenum pname, GLint *params )
 {
   /* TODO: Handle ones old Mesa can't or won't */
@@ -499,9 +497,9 @@ void glGetIntegerv2( GLenum pname, GLint *params )
       *params=5;
       break;
     case 3414:
-      fprintf(stderr,"FYI glGetIntegerv is lying and we are saying SDL_GL_DEPTH 16\n"); fflush(stderr);
+      fprintf(stderr,"FYI glGetIntegerv is lying and we are saying SDL_GL_DEPTH 32\n"); fflush(stderr);
       fprintf(stderr,"FYI glGetIntegerv_old said %d 0x%x\n",*params,*params); fflush(stderr);
-      *params=16;
+      *params=32;
       break;
     default:
       /* Assume old Mesa answered correctly... */
@@ -610,15 +608,6 @@ void glDepthFunc( GLenum func )
 }
 
 
-/*
-void glColor4ub( GLubyte red, GLubyte green,
-			GLubyte blue, GLubyte alpha )
-{
-  fprintf(stderr,"glColor4ub...not implemented\n"); fflush(stderr);
-}
-*/
-
-
 void glDepthMask(int)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
@@ -712,4 +701,73 @@ void glDrawBuffer( GLenum mode )
 }
 
 
+void glMap2f( GLenum target,
+		     GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
+		     GLfloat v1, GLfloat v2, GLint vstride, GLint vorder,
+		     const GLfloat *points )
+{
+  fprintf(stderr,"glMap2f...not implemented\n"); fflush(stderr);
+}
+
+
+void glMapGrid2f( GLint un, GLfloat u1, GLfloat u2,
+			 GLint vn, GLfloat v1, GLfloat v2 )
+{
+  fprintf(stderr,"glMapGrid2f...not implemented\n"); fflush(stderr);
+}
+
+
+void glEvalMesh2( GLenum mode, GLint i1, GLint i2, GLint j1, GLint j2 )
+{
+  fprintf(stderr,"glEvalMesh2...not implemented\n"); fflush(stderr);
+}
+
+
+void glClearIndex(GLfloat foo)
+{
+  fprintf(stderr,"glClearIndex...not implemented\n"); fflush(stderr);
+}
+
+
+void glIndexf(GLfloat foo)
+{
+  fprintf(stderr,"glIndexf...not implemented\n"); fflush(stderr);
+}
+
+
+void glIndexi(GLint foo)
+{
+  fprintf(stderr,"glIndexi...not implemented\n"); fflush(stderr);
+}
+
+
+// You shouldn't ever have both TinyGL and Mesa linked, unless one of them in mangled.
+
+typedef ostgl_context_t * OSMesaContext;
+
+
+// Somewhat compatibility...
+OSMesaContext OSMesaCreateContext( GLenum format,
+                                          OSMesaContext sharelist )
+{
+  // Unlike Mesa, TinyGL wants everything when you create the context
+  fprintf(stderr,"Fake OSMesaCreateContext...don't use this!!!\n"); fflush(stderr);
+  // These should be what the screen really is...
+  int w=640,h=480;
+  int d=32;
+  ostgl_context_t *tc=ostgl_create_context(w,h,d);
+  return (OSMesaContext)tc;
+}
+
+
+// Somewhat compatibility...
+GLboolean OSMesaMakeCurrent( OSMesaContext ctx,
+                                    void *buffer, GLenum type,
+                                    GLsizei width, GLsizei height )
+{
+  // Too late we get the real size!
+  // And already have the pixels...sigh...
+  fprintf(stderr,"Fake OSMesaMakeCurrent...don't use this!!!\n"); fflush(stderr);
+  return true;
+}
 
