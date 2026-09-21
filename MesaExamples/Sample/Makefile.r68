@@ -1,0 +1,25 @@
+
+CC=m68k-apple-macos-gcc
+CXX=m68k-apple-macos-g++
+#CC=powerpc-apple-macos-gcc
+#CXX=powerpc-apple-macos-g++
+
+CFLAGS= -I../../Headers
+LDFLAGS=-lglut -lOpenGLUtility -lOpenGLLibrary -lm
+
+OBJS=$(subst .c,.o,$(wildcard *.c)) $(subst .cpp,.o,$(wildcard *.cpp))
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -c -o $@ $<
+
+.c.o:
+	$(CXX) $(CFLAGS) -c -o $@ $<
+
+all: $(OBJS)
+	$(CXX) -o sample.code.bin $(OBJS) $(LDFLAGS)
+	../bin2app.sh sample
+#	$(CC) -o sample $(OBJS) $(LDFLAGS)
+#	$(HOME)/sdl2macos9/xcoff2app.sh sample
+
+clean:
+	rm -f *.o *.bin *.pef *.APPL *.dsk *.gdb sample

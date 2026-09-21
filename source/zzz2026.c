@@ -650,23 +650,11 @@ void glTexParameterf(int, int, int)
 }
 
 
-void glTexImage1D( GLenum target, GLint level, GLint components,
-			  GLsizei width, GLint border,
-			  GLenum format, GLenum type, const GLvoid *pixels )
+void glTexImage1D( int target, int level, int components,
+			  int width, int border,
+			  int format, int type, void *pixels )
 {
   fprintf(stderr,"glTexImage1D...not implemented\n"); fflush(stderr);
-}
-
-
-void glTranslated( GLdouble x, GLdouble y, GLdouble z )
-{
-  fprintf(stderr,"glTranslated...not implemented\n"); fflush(stderr);
-}
-
-
-void glMultMatrixd( const GLdouble *m )
-{
-  fprintf(stderr,"glMultMatrixd...not implemented\n"); fflush(stderr);
 }
 
 

@@ -6,8 +6,8 @@
 /* It uses either Mesa or TinyGL's offscreen rendering */
 
 
-// NOTE: You can, and should, use a real Apple agl.h
-#include <GL/agl.h>
+// NOTE: We want to use the real one, but use ours for now...
+#include "agl.h"
 
 
 // Define SDL_MACOSCLASSIC_TINYGL to use TinyGL, otherwise we will assume Mesa

@@ -1,0 +1,31 @@
+
+#CC=m68k-apple-macos-gcc
+#CXX=m68k-apple-macos-g++
+CC=powerpc-apple-macos-gcc
+CXX=powerpc-apple-macos-g++
+
+CFLAGS= -I../../include -Dmain=SDL_main
+
+LDFLAGS=-L../.. -lglut -lMesaOpenGLUtility -lMesaOpenGLLibrary
+LDFLAGS+= -lSDL2  ../../../sdl2macos9/SDL-main/src/main/macosclassic/SDL_main.o
+LDFLAGS+=-lInputSprocketLib -lDrawSprocketLib -lThreadsLib -lm
+
+
+OBJS=$(subst .c,.o,$(wildcard *.c)) $(subst .cpp,.o,$(wildcard *.cpp))
+
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -c -o $@ $<
+
+.c.o:
+	$(CXX) $(CFLAGS) -c -o $@ $<
+
+
+all: $(OBJS)
+#	$(CXX) -o opengl_logo.code.bin $(OBJS) $(LDFLAGS)
+# ../bin2app.sh opengl_logo
+	$(CC) -o opengl_logo $(OBJS) $(LDFLAGS)
+	../xcoff2app.sh opengl_logo
+
+clean:
+	rm -f *.o *.bin *.pef *.APPL *.dsk *.gdb opengl_logo

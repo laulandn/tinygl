@@ -7,7 +7,7 @@ CFLAGS=-I../include -I.. -I$(HOME)/Retro68-build/toolchain/m68k-apple-macos/incl
 #CFLAGS=-I../../include -I.. -I/opt/local/include/SDL3 -I../../../stb
 
 SDLMAIN=
-LDFLAGS= -L.. -lSDL3 $(HOME)/sdl3macos9/macos8addons/libmacos8addons.a -lglu -lTinyGL -lm 
+LDFLAGS= -L.. -lSDL3 ../../sdl3macos9/macos8addons/libmacos8addons.a -lglu -lTinyGL -lm 
 #LDFLAGS=-L../../lib -lTinyGL -L/opt/local/lib -lSDL3
 
 

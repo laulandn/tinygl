@@ -1,9 +1,9 @@
-/* $Id: gluP.h,v 1.1.1.1.2.2 2000/07/11 01:39:41 brianp Exp $ */
+/* $Id: gluP.h,v 1.3 1997/08/01 22:25:27 brianp Exp $ */
 
 /*
  * Mesa 3-D graphics library
- * Version:  3.2.1
- * Copyright (C) 1995-2000  Brian Paul
+ * Version:  2.4
+ * Copyright (C) 1995-1997  Brian Paul
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,6 +22,21 @@
 
 
 /*
+ * $Log: gluP.h,v $
+ * Revision 1.3  1997/08/01 22:25:27  brianp
+ * check for Cygnus Win32 (Stephen Rehel)
+ *
+ * Revision 1.2  1997/05/27 02:59:46  brianp
+ * added defines for APIENTRY and CALLBACK if not compiling on Win32
+ *
+ * Revision 1.1  1996/09/27 01:19:39  brianp
+ * Initial revision
+ *
+ */
+
+
+
+/*
  * This file allows the GLU code to be compiled either with the Mesa
  * headers or with the real OpenGL headers.
  */
@@ -34,7 +49,17 @@
 #include "GL/gl.h"
 #include "GL/glu.h"
 
-#include <string.h>
+
+/* define APIENTRY */
+#ifdef __CYGWIN32__
+#include <windows.h>
+#endif
+
+#ifndef __WIN32__
+#define APIENTRY
+#define CALLBACK
+#endif
+
 
 #ifndef MESA
    /* If we're using the real OpenGL header files... */

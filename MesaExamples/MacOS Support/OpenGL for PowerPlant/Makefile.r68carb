@@ -1,0 +1,26 @@
+
+#CC=m68k-apple-macos-gcc
+#CXX=m68k-apple-macos-g++
+CC=powerpc-apple-macos-gcc -carbon
+CXX=powerpc-apple-macos-g++ -carbon
+
+CFLAGS= -I../../../Headers
+LDFLAGS=-lglut -lOpenGLUtility -lOpenGLLibrary -lm
+
+OBJS=$(subst .c,.o,$(wildcard *.c)) $(subst .cpp,.o,$(wildcard *.cpp))
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -c -o $@ $<
+
+.c.o:
+	$(CXX) $(CFLAGS) -c -o $@ $<
+	
+
+all: $(OBJS)
+#	$(CXX) -o opengl_for_powerplant.code.bin $(OBJS) $(LDFLAGS)
+#	../../bin2app.sh opengl_for_powerplant
+#	$(CC) -o opengl_for_powerplant $(OBJS) $(LDFLAGS)
+#	$(HOME)/sdl2macos9/xcoff2app.sh opengl_for_powerplant
+
+clean:
+	rm -f *.o *.bin *.pef *.APPL *.dsk *.gdb

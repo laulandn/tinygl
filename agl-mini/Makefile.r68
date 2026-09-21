@@ -9,9 +9,10 @@ RANLIB=m68k-apple-macos-ranlib
 #AR=powerpc-apple-macos-ar
 #RANLIB=powerpc-apple-macos-ranlib
 
-CFLAGS= -I../include -Dmacintosh -DSDL_MACOSCLASSIC_TINYGL=1 -DUSING_SDL2
-#CFLAGS= -I../include -Dmacintosh
+CFLAGS= -I. -I../include -I../include/GL -Dmacintosh
 
+CFLAGS+= -DSDL_MACOSCLASSIC_TINYGL=1
+CFLAGS+= -DUSING_SDL2
 
 OBJS=$(subst .c,.o,$(wildcard *.c))
 

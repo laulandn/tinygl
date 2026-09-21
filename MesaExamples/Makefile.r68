@@ -1,0 +1,24 @@
+
+all:
+	make -f Makefile.r68 -C Chess
+	make -f Makefile.r68 -C Geoface
+	make -f Makefile.r68 -C Glutmech
+	make -f Makefile.r68 -C Ideas
+	make -f Makefile.r68 -C OpenGL\ logo
+	make -f Makefile.r68 -C Rollercoaster
+	make -f Makefile.r68 -C UnderWater
+	make -f Makefile.r68 -C Walker
+	make -f Makefile.r68 -C Sample
+	
+clean:
+	make -f Makefile.r68 -C Chess clean
+	make -f Makefile.r68 -C Glutmech clean
+	make -f Makefile.r68 -C Geoface clean
+	make -f Makefile.r68 -C Ideas clean
+	make -f Makefile.r68 -C OpenGL\ logo clean
+	make -f Makefile.r68 -C Rollercoaster clean
+	make -f Makefile.r68 -C UnderWater clean
+	make -f Makefile.r68 -C Walker clean
+	make -f Makefile.r68 -C Sample clean
+	rm -rf */*.o
+	rm -rf */*\ Data

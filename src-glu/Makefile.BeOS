@@ -2,8 +2,8 @@
 # Tinic Uro <5uro@informatik.uni-hamburg.de>
 
 # Mesa 3-D graphics library
-# Version:  3.2.1
-# Copyright (C) 1995-2000  Brian Paul
+# Version:  2.2
+# Copyright (C) 1995-1997  Brian Paul
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -29,7 +29,7 @@ INCDIR = ../include
 LIBDIR = ../lib
 
 SOURCES = glu.c mipmap.c nurbs.c nurbscrv.c nurbssrf.c nurbsutl.c \
-	polytest.c project.c quadric.c tess.c tesselat.c
+	project.c quadric.c tess.c tesselat.c polytest.c
 
 OBJECTS = $(SOURCES:.c=.o)
 
@@ -38,7 +38,7 @@ OBJECTS = $(SOURCES:.c=.o)
 ##### RULES #####
 
 .c.o:
-	$(CC) -c -i . -i- -i $(INCDIR) $(CFLAGS) $<
+	$(CC) -c -I$(INCDIR) $(CFLAGS) $<
 
 
 
@@ -54,9 +54,9 @@ targets: $(LIBDIR)/$(GLU_LIB)
 
 # Make the library:
 $(LIBDIR)/$(GLU_LIB): $(OBJECTS)
-	$(MAKELIB) $(GLU_LIB) $(MAJOR) $(MINOR) $(TINY) $(OBJECTS)
+#	$(MAKELIB) $(GLU_LIB) $(OBJECTS)
 #	$(RANLIB) $(GLU_LIB)
-	mv $(GLU_LIB)* $(LIBDIR)
+#	mv $(GLU_LIB)* $(LIBDIR)
 
 include ../Make-config
 

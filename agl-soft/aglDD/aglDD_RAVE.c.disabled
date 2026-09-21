@@ -1,0 +1,1267 @@
+/*
+** aglDD_ColorRAVE.c - RAVE driver for AGL, version: 2.3d0
+*/
+
+/*
+** AGL driver for Mesa 3D Graphics Library.
+** Version: 0.1
+** Mesa version: 2.3
+**
+** Copyright(C) 1996 Miklos Fazekas
+** E-Mail: boga@augusta.inf.elte.hu
+** WWW: http://www.elte.hu/~boga/Mesa.html
+** 
+** Part of the port of the Mesa 3D Graphics Library for MacOSª
+**
+*/
+ 
+/*
+** Copyright 1996, Mikl—s Fazekas.
+** All Rights Reserved.
+** 
+** This library is free software; you can redistribute it and/or
+** modify it under the terms of the GNU Library General Public
+** License as published by the Free Software Foundation; either
+** version 2 of the License, or (at your option) any later version.
+**
+** This library is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+** Library General Public License for more details.
+**
+** You should have received a copy of the GNU Library General Public
+** License along with this library; if not, write to the Free
+** Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/*
+ *
+ * 1997/06/03: Inital revision
+ */
+
+/* OpenGL */
+#include <gl.h>
+#include <agl.h>
+
+/* AGL */
+#include "aglConfig.h"
+#include "aglError.h"
+#include "aglContext.h"
+#include "aglPixelFormat.h"
+#include "aglMemUtil.h"
+
+#include "aglDDManager.h"
+
+#include "aglDDUtil.h"
+#include "aglDD_RAVE.h"
+#include "aglDDArgs.h"
+
+/* Mesa */
+#include "types.h"
+#include "vb.h"
+
+/* As in fixed.h:
+ *	0.00048828125 = 1/FIXED_SCALE 
+ */
+#define RAVEFixedToFloat(X) ((X >> 8) * 0.00048828125f)
+
+#define MESA_COLOR_TO_RGB(rgb,r,g,b,a) { rgb.red = r << 8; rgb.green = g << 8; rgb.blue = b << 8;}
+#define GET_PRIVATE_DATA(ctx,myPrivate)	TRADriverPrivate* myPrivate = (TRADriverPrivate*)(((AGLContext) ctx->DriverCtx)->driverPrivate); 
+
+
+static GLboolean gDriverInstalled; 
+static TDDDriverFT *gDriverFT = nil;
+
+extern void gl_Viewport( GLcontext *ctx,
+                         GLint x, GLint y, GLsizei width, GLsizei height );
+
+
+static void __aglDDCacheColorQD( GLcontext *ctx )
+{
+	/* TODO */
+}
+
+
+void DDUSetPort(AGLDrawable drawable,void *mystery,AGLDrawable *savePort)
+{
+}
+
+
+void DDURestorePort(AGLDrawable *drawable)
+{
+}
+
+
+/*************************************************************
+ *	DD functions:
+ *************************************************************/
+
+/************************************************************************************************
+ *
+ * RABufferSize: Returns the width and height of the current color buffer.
+ * 
+ ************************************************************************************************/
+static void RAGetBufferSize( GLcontext *ctx, GLuint *width, GLuint *height )
+{
+	GET_PRIVATE_DATA(ctx,myPrivate);
+	
+	*width = myPrivate->width;
+	*height = myPrivate->height;
+}
+
+/*************************************************************
+ *
+ * Accelerated Triangle/Line Functions:
+ *
+ *************************************************************/
+
+static float frand (void)
+{
+	return ((Random() + 32768) / 65536.0);
+}
+
+void TestRandomVGouraud (
+	TQAVGouraud		*v)
+{
+	v->x = frand() * 300;
+	v->y = frand() * 300;
+	v->z = frand();
+	v->invW = 1.0 / v->z;
+	
+	v->a = 1.0;
+	v->r = frand();
+	v->g = frand();
+	v->b = frand();
+}
+static void RADrawLine( GLcontext *ctx,
+									GLuint v0, GLuint v1, GLuint pv)
+{
+	struct vertex_buffer *VB = ctx->VB;
+	TQAVGouraud vertex0,vertex1;
+	GET_PRIVATE_DATA(ctx,myPrivate);
+	
+	if (VB->MonoColor) {
+		/*
+		 * Set up the vertex's color from the current color.
+		 */
+		vertex0.r = myPrivate->currentColor.r;
+		vertex1.r = myPrivate->currentColor.r;
+		
+		vertex0.g = myPrivate->currentColor.g;
+		vertex1.g = myPrivate->currentColor.g;
+		
+		vertex0.b = myPrivate->currentColor.b;
+		vertex1.b = myPrivate->currentColor.b;
+		
+		vertex0.a = myPrivate->currentColor.a;
+		vertex1.a = myPrivate->currentColor.a;
+	} 
+	else {
+		/*
+		 * Set up the vertex's color from the Vertex Buffer.
+		 */
+		 vertex0.r = RAVEFixedToFloat(VB->Fcolor[v0][0]);
+		 vertex0.g = RAVEFixedToFloat(VB->Fcolor[v0][1]);
+		 vertex0.b = RAVEFixedToFloat(VB->Fcolor[v0][2]);
+		 vertex0.a = 1.0; /* RAVEFixedToFloat(VB->Fcolor[v0][3]); */
+		 
+		 vertex1.r = RAVEFixedToFloat(VB->Fcolor[v1][0]);
+		 vertex1.g = RAVEFixedToFloat(VB->Fcolor[v1][1]);
+		 vertex1.b = RAVEFixedToFloat(VB->Fcolor[v1][2]);
+		 vertex1.a = 1.0; /* RAVEFixedToFloat(VB->Fcolor[v1][3]); */
+	}
+	
+	/*
+	 * Set up corrdinates:
+	 */
+	vertex0.x = VB->Win[v0][0];
+	vertex0.y = VB->Win[v0][1];
+	vertex0.z = VB->Win[v0][2] / DEPTH_SCALE;
+	
+	vertex1.x = VB->Win[v1][0];
+	vertex1.y = VB->Win[v1][1];
+	vertex1.z = VB->Win[v1][2] / DEPTH_SCALE;
+	
+	/*
+	 * Draw the line:
+	 */
+	 QADrawLine(myPrivate->drawContext,&vertex0,&vertex1);
+	
+}
+static void RADrawTriangle( GLcontext *ctx,
+									GLuint v0, GLuint v1, GLuint v2,	/* The vertexes of the triangle */ 
+									GLuint pv )							/* The provoking vertex of this triangle */
+{
+	struct vertex_buffer *VB = ctx->VB;
+	TQAVGouraud vertex0,vertex1,vertex2;
+	GET_PRIVATE_DATA(ctx,myPrivate);
+
+	
+	if (VB->MonoColor) {
+		/*
+		 * Set up the vertex's color from the current color.
+		 */
+		vertex0.r = myPrivate->currentColor.r;
+		vertex1.r = myPrivate->currentColor.r;
+		vertex2.r = myPrivate->currentColor.r;
+		
+		vertex0.g = myPrivate->currentColor.g;
+		vertex1.g = myPrivate->currentColor.g;
+		vertex2.g = myPrivate->currentColor.g;
+		
+		vertex0.b = myPrivate->currentColor.b;
+		vertex1.b = myPrivate->currentColor.b;
+		vertex2.b = myPrivate->currentColor.b;
+		
+		vertex0.a = myPrivate->currentColor.a;
+		vertex1.a = myPrivate->currentColor.a;
+		vertex2.a = myPrivate->currentColor.a;
+	}
+	else {
+		/*
+		 * Set up the vertex's color from the Vertex Buffer.
+		 */
+		 vertex0.r = RAVEFixedToFloat(VB->Fcolor[v0][0]);
+		 vertex0.g = RAVEFixedToFloat(VB->Fcolor[v0][1]);
+		 vertex0.b = RAVEFixedToFloat(VB->Fcolor[v0][2]);
+		 vertex0.a = 1.0; /* RAVEFixedToFloat(VB->Fcolor[v0][3]); */
+		 
+		 vertex1.r = RAVEFixedToFloat(VB->Fcolor[v1][0]);
+		 vertex1.g = RAVEFixedToFloat(VB->Fcolor[v1][1]);
+		 vertex1.b = RAVEFixedToFloat(VB->Fcolor[v1][2]);
+		 vertex1.a = 1.0; /* RAVEFixedToFloat(VB->Fcolor[v1][3]); */
+		 
+		 vertex2.r = RAVEFixedToFloat(VB->Fcolor[v2][0]);
+		 vertex2.g = RAVEFixedToFloat(VB->Fcolor[v2][1]);
+		 vertex2.b = RAVEFixedToFloat(VB->Fcolor[v2][2]);
+		 vertex2.a = 1.0; /* RAVEFixedToFloat(VB->Fcolor[v2][3]); */
+	}
+	
+	/*
+	 * Set up corrdinates:
+	 */
+	vertex0.x = VB->Win[v0][0];
+	vertex0.y = VB->Win[v0][1];
+	vertex0.z = VB->Win[v0][2] / DEPTH_SCALE;
+	
+	vertex1.x = VB->Win[v1][0];
+	vertex1.y = VB->Win[v1][1];
+	vertex1.z = VB->Win[v1][2] / DEPTH_SCALE;
+	
+	vertex2.x = VB->Win[v2][0];
+	vertex2.y = VB->Win[v2][1];
+	vertex2.z = VB->Win[v2][2] / DEPTH_SCALE;
+	
+
+	/*
+	 * Set up invW : 1/w;
+	 */
+	/* vertex0.invW = 1/vertex0.z;
+	vertex1.invW = 1/vertex1.z;
+	vertex2.invW = 1/vertex2.z; */
+	
+	/*
+	 * Draw the triangle:
+	 */
+	 
+	QADrawTriGouraud(myPrivate->drawContext,&vertex0,&vertex1,&vertex2,kQATriFlags_None);
+}
+
+/************************************************************************************************
+ *
+ *	RAFlush
+ *
+ ***********************************************************************************************/
+static void RAFlush(
+		 GLcontext *ctx )		/* Draw context */
+{
+	TRADriverPrivate		*myPrivate;
+	
+	myPrivate = (TRADriverPrivate *) ctx->DriverCtx;
+	
+	/*
+	 * If rendering commands are queued, start running them.
+	 */
+	QAFlush(myPrivate->drawContext);
+}
+
+/************************************************************************************************
+ *
+ *	RAFinish
+ *
+ ***********************************************************************************************/
+static void RAFinish( 
+			GLcontext *ctx )	/* Draw context */
+{
+	TRADriverPrivate		*myPrivate;
+	
+	myPrivate = (TRADriverPrivate *) ctx->DriverCtx;
+	
+	/*
+	 * Don't return until all outstanding rendering is complete.
+	 */
+	QASync(myPrivate->drawContext);
+}
+
+/************************************************************************************************
+ *
+ *	RASetBuffer:  Selects either the front or back color buffer for reading and writing. 
+ *				  Mode is either GL_FRONT or GL_BACK.
+ *
+ ***********************************************************************************************/
+static GLboolean RASetBuffer( GLcontext *ctx, GLenum mode )
+{
+	TRADriverPrivate		*myPrivate;
+	
+	myPrivate = (TRADriverPrivate *) ctx->DriverCtx;
+	
+	/*
+	 * QD RAVE Doesn't support this so only an error handler.
+	 */
+ 	if (mode == GL_FRONT) 
+ 	{
+ 		if (myPrivate->pixFmt.doubleBuffer) 
+ 		{
+ 			AGLSetGLError(ctx->DriverCtx,GL_INVALID_OPERATION,"RAVE Driver can't draw to the front buffer of a double buffered context!");
+ 		}
+ 	}
+ 	else if (mode == GL_BACK && myPrivate->pixFmt.doubleBuffer)
+ 	{
+ 		
+ 	}
+ 	else
+ 	{
+ 		AGLSetGLError(ctx->DriverCtx,GL_INVALID_OPERATION,"Invalid operation in __aglDD_SetBuffer!");
+ 		return GL_FALSE;
+ 	}
+ 	
+ 	return GL_TRUE;
+}
+
+/************************************************************************************************
+ *
+ *	RAClearColor: Set the color for clearing the color buffer.
+ *
+ ***********************************************************************************************/
+
+static void RAClearColor( GLcontext *ctx,				/* Draw context */
+                         GLubyte red, GLubyte green,
+                         GLubyte blue, GLubyte alpha )
+{
+	TRADriverPrivate		*myPrivate;
+	
+	myPrivate = (TRADriverPrivate *) ctx->DriverCtx;
+   
+	QASetFloat(myPrivate->drawContext,kQATag_ColorBG_r,red/255.0);
+	QASetFloat(myPrivate->drawContext,kQATag_ColorBG_r,green/255.0);
+	QASetFloat(myPrivate->drawContext,kQATag_ColorBG_r,blue/255.0);
+	QASetFloat(myPrivate->drawContext,kQATag_ColorBG_r,alpha/255.0);
+}
+
+/************************************************************************************************
+ *
+ *	RAColor: Sets current color for drawing flat-shaded primitives..
+ *
+ ***********************************************************************************************/
+static void RAColor( GLcontext *ctx,						/* Draw context */
+                         GLubyte red, GLubyte green,		/* The drawing color's red/green/blue/alpha value */
+                         GLubyte blue, GLubyte alpha )
+{
+	TRADriverPrivate		*myPrivate;
+	
+	myPrivate = (TRADriverPrivate *) ctx->DriverCtx;
+	
+	myPrivate->currentColor.r = red/255.0;
+	myPrivate->currentColor.g = green/255.0;
+	myPrivate->currentColor.b = blue/255.0;
+	myPrivate->currentColor.a = alpha/255.0;
+}
+
+/************************************************************************************************
+ *
+ *	RAClear: Clear the current color buffer.  If 'all' is set the clear the whole buffer,
+ *   	      else clear the region defined by (x,y,width,height).
+ *	TODO: MAKE A RAVE RECT IF NOT THE WHOLE IS CLEARED
+ *
+ ***********************************************************************************************/
+ 
+static void RAClear( 	GLcontext *ctx,									/* Draw context */
+					   	GLboolean all,									/* GL_TRUE means the whole buffer */
+						GLint x, GLint y, GLint width, GLint height)	/* Area to clear */
+{
+	Rect 					clearRect;
+	//TDDUPortSave 			portSave;
+	TRADriverPrivate		*myPrivate;
+	
+	myPrivate = (TRADriverPrivate *) ctx->DriverCtx;
+	
+
+	/*
+	 * Set the area to clear.
+	 */
+	if (all) 
+	{
+		SetRect(&clearRect,0,0,myPrivate->width,myPrivate->height); 
+	} 
+	else 
+	{
+		SetRect(&clearRect,x,AGL_FLIP(y+height),x+width,AGL_FLIP(y));
+	}
+	
+	
+	QARenderStart(myPrivate->drawContext,(TQARect *)&clearRect,NULL);
+}
+
+
+
+
+
+/************************************************************************************************
+ *
+ *	Functions for writing pixels to the frame buffer
+ *
+ ***********************************************************************************************/
+/************************************************************************************************
+ * C32WriteColorPixels: Write an array of RGB pixels at random locations.
+ ***********************************************************************************************/
+
+static void RAWriteColorPixels( AGL_WRITE_COLOR_PIXELS_PARAM )
+{
+	/* RAVE DOESN'T SUPPORT IT! */
+}
+
+static void RAWriteMonocolorPixels( GLcontext *ctx,								
+  								 GLuint n, const GLint x[], const GLint y[], 	
+  								 const GLubyte mask[] )
+{
+	/* RAVE DOESN'T SUPPORT IT! */
+}
+
+/*****************************************************************************
+ * Write spans of pixels:
+ *****************************************************************************/
+static void RAWriteColorSpan( AGL_WRITE_COLOR_SPAN_PARAM )
+{
+	/* RAVE DOESN'T SUPPORT IT! */
+}
+
+ static void RAWriteMonocolorSpan( GLcontext	*ctx,
+  								GLuint n, GLint x, GLint y,
+  								const GLubyte mask[] )
+{
+	/* RAVE DOESN'T SUPPORT IT! */
+}
+/***********************************************************************************************
+ * C32ReadColorSpanRGB: Read a horizontal run of RGB pixels.
+ ***********************************************************************************************/
+static void RAReadColorSpanRGB( GLcontext *ctx,
+                             	 GLuint n, GLint x, GLint y,
+                             	 GLubyte red[], GLubyte green[],
+                             	 GLubyte blue[], GLubyte alpha[] )
+{
+	/* RAVE DOESN'T SUPPORT IT!(TODO) */
+}
+
+/***********************************************************************************************
+ * C32ReadColorSpanRGB: Read a random array of RGB pixels.
+ ***********************************************************************************************/
+static void RAReadColorPixelRGB( GLcontext *ctx,
+                               	  GLuint n, const GLint x[], const GLint y[],
+                              	  GLubyte red[], GLubyte green[],
+                               	  GLubyte blue[], GLubyte alpha[],
+                                  const GLubyte mask[] )
+{
+	/* RAVE DOESN'T SUPPORT IT!(TODO) */
+}
+
+/***********************************************************************************************
+ *
+ * RAUpdateState: UpdateState() is called whenver Mesa thinks the device driver should update 
+ *				   its state and/or the other pointers (such as PointsFunc, LineFunc, 
+ *				   or TriangleFunc).
+ *
+ ***********************************************************************************************/
+
+static void RAUpdateState( GLcontext *ctx )
+{
+  GET_PRIVATE_DATA(ctx,myPrivate);
+  /* 
+   * Initialize all the pointers in the DD struct.  Do this whenever 
+   * a new context is made current or we change buffers via set_buffer! 
+   */
+  
+  ctx->Driver.SetBuffer = RASetBuffer;
+  ctx->Driver.Clear = RAClear;
+  ctx->Driver.ClearColor = RAClearColor;
+  ctx->Driver.Color = RAColor;
+  
+  ctx->Driver.GetBufferSize = RAGetBufferSize;
+  
+  ctx->Driver.WriteColorSpan =RAWriteColorSpan;
+  ctx->Driver.WriteMonocolorSpan = RAWriteMonocolorSpan;
+  
+  ctx->Driver.WriteColorPixels = RAWriteColorPixels;
+  ctx->Driver.WriteMonocolorPixels = RAWriteMonocolorPixels;
+  
+  /*
+   * Set up accelerated point/line/triangle functions:
+   */
+  ctx->Driver.TriangleFunc = RADrawTriangle;
+  ctx->Driver.LineFunc = RADrawLine;
+}
+
+
+/************************************************************************************************
+ * 
+ * RAChooseMode: implements aglChoosePixelFmt chooses a pixel format from the minimum pixelformat.
+ *
+ ***********************************************************************************************/
+
+static AGLPixelFmt RAChooseMode(
+						const TAGLPixelFmtReq* inPixFmtReq )	/* Required pixel-format pixel format */
+{
+	GLboolean	succes;
+	AGLPixelFmt result;
+	int minGDepth,maxGDepth;
+	
+	/**
+	 ** STEP 1: return NULL for unsupportted modes.
+	 **/
+	
+	/*
+	 * No over/underlay support.
+	 */
+	if (inPixFmtReq->overlayLevel != 0)
+	{
+		return NULL;
+	}
+	/*
+	 * We are supporting only rgba pixel-fmts
+	 */
+	if (!inPixFmtReq->rgba) 
+	{
+	    return NULL;		
+	}
+	
+	/*
+	 * We don't support more than 8-bit's per components.
+	 */
+	if ((inPixFmtReq->redSize > 8) || (inPixFmtReq->greenSize >8) || (inPixFmtReq->blueSize > 8)) 
+	{
+		return NULL;		
+	}
+	
+	/*
+	 * We doesn't support alpha with more than 8-bit
+	 */
+	if (inPixFmtReq->alphaSize > 8) 
+	{
+		return NULL;		
+	}
+	
+	/*
+	 * We doesn't support stereo-buffers.
+	 */
+	if (inPixFmtReq->stereo) 
+	{
+		return NULL;
+	}
+	
+	/*
+	 * We doesn't support double-buffering (yet TODO).
+	 */
+	if (inPixFmtReq->doubleBuffer)
+	{
+		return NULL;
+	}
+	
+	/**
+	 ** STEP 2: Create and fill out the other parts of the result.
+	 **/
+	result = AGLAllocatePixelFormat(inPixFmtReq);
+	
+	if (result == NULL)
+	{
+		return NULL;
+	}
+	
+	/*
+	 * Set up color components
+	 */
+	result->redSize = 8;
+	result->greenSize = 8;
+	result->blueSize = 8;
+	
+	/*
+	 * Alpha buffer:
+	 */
+	if (result->alphaSize > 0)
+	{
+		result->alphaSize = 8;
+		result->softwareAlpha = GL_TRUE; /* Or GL_FALSE, if we support it */
+	}
+	else
+	{
+		result->alphaSize = 0;
+		result->softwareAlpha = GL_FALSE;
+	}
+	
+	result->colorDepth = 32;
+	
+	/*
+	 * Set up solor scales.
+	 */
+	result->redScale = 255.0;
+	result->greenScale = 255.0;
+	result->blueScale = 255.0;
+	result->alphaScale = 255.0;
+	
+	
+	/*
+	 * See if mesa is supports this pixel-fmt, and let it do the following setup.
+	 */
+	succes = DDUMesaSetupPixelFmt( result );
+	
+	if (!succes)
+	{
+		AGLDisposePixelFormat( result );
+		return NULL;
+	}
+	
+	/*
+	 * Check if there is a drawing engine wich supports this device:
+	 */
+	{
+		TQADevice 	device;
+		TQAEngine	*engine;
+		
+		device.deviceType 		= kQADeviceGDevice;
+		device.device.gDevice 	= *(inPixFmtReq->dev)/*GetGWorldDevice(inPixFmtReq->drawable)*/;
+	
+		/*
+	 	 * TODO: select the best engine and return it's speed.
+		 */
+		engine = QADeviceGetFirstEngine(&device);
+		
+		if (engine == NULL)
+		{
+			AGLDisposePixelFormat( result );
+			return NULL;
+		}
+		else
+		{
+			result->driverData[0] = (long)engine;
+			result->speed = 32;
+		}
+	}
+	
+	return result;
+}
+
+
+/************************************************************************************************
+ *
+ * RAInitializeContext: Create the private draw context data.
+ *
+ ***********************************************************************************************/
+static GLboolean RAInitializeContext(
+				 GLcontext			*gl_ctx,	/* Draw context to initialize */
+				 const AGLContext	aglCtx,		/* AGL context, for error registering */
+				 const AGLPixelFmt	pixFmt,		/* Selected pixel-format */	
+				 const AGLDrawable	drawable)	/* Target drawable */
+{
+	TRADriverPrivate *newDriverPrivate;
+	long			 width, height;
+	Rect			 rect;
+	
+	if (!AGLIsValidPixelFormat(pixFmt))
+	{
+		return GL_FALSE;
+	}
+	
+	
+	/*
+	 * Allocate the TDDDiverPrivate structure.
+	 */
+
+	newDriverPrivate = (TRADriverPrivate *) AGLMemoryNewClear( sizeof( TRADriverPrivate));
+	if (newDriverPrivate == NULL) 
+	{
+		AGLSetGLError(aglCtx,GL_OUT_OF_MEMORY,"RAInitializeContext: Out of memory!");
+		return GL_TRUE;
+	}
+	
+	/*
+	 * Store a copy from the pixel-format, and from the drawable
+	 */
+	newDriverPrivate->pixFmt = *pixFmt;
+	
+	newDriverPrivate->drawable = drawable;
+	
+	newDriverPrivate->gl_ctx = gl_ctx;
+	
+	newDriverPrivate->aglCtx = aglCtx;
+	
+	/*
+	 * Initialize the dimension of drawable.
+	 */
+	
+	rect = drawable->portRect;
+	newDriverPrivate->width = width = rect.right - rect.left;
+	newDriverPrivate->height = height = rect.bottom - rect.top;
+	
+
+	
+	/*
+	 * Initialize the fornt (and back) buffer.
+	 */
+	 
+	{
+		Point		topLeft, botRight;
+		TQARect 	drawableRect;
+		TQAError 	status;
+		TQADevice	device;
+		long		flags;
+    AGLDrawable	 savePort;
+    
+		
+		/*
+		 * Set the flags (TODO)
+		 */
+		
+		flags = 0; 
+		
+		/*
+	 	 * Get the boundaries of the drawable window, and compute its size.
+	 	 */
+		topLeft.v = drawable->portRect.top;
+		topLeft.h = drawable->portRect.left;
+		botRight.v = drawable->portRect.bottom;
+		botRight.h = drawable->portRect.right;
+		
+		/*
+		 * Convert window boundaries to global co-ordinates.
+		 */
+			
+		DDUSetPort (drawable,NULL,&savePort);
+		LocalToGlobal (&topLeft);
+		LocalToGlobal (&botRight);
+		DDURestorePort(&savePort);
+		
+		/*
+		 * Create a rave device.
+		 */
+			
+		device.deviceType = kQADeviceGDevice;
+		device.device.gDevice = GetGWorldDevice(drawable);
+
+		/*
+		 * Create the bound rectangle in device coordinates.
+		 */
+					
+		drawableRect.top = topLeft.v - (*device.device.gDevice)->gdRect.top;
+		drawableRect.left = topLeft.h - (*device.device.gDevice)->gdRect.left;
+		drawableRect.bottom = botRight.v - (*device.device.gDevice)->gdRect.top;
+		drawableRect.right = botRight.h - (*device.device.gDevice)->gdRect.left;
+		
+		
+		/*
+		 * Choose a RAVE engine (TODO select the best):
+		 */
+			TQAEngine	*myEngine;
+		{			
+			myEngine = (TQAEngine*)(pixFmt->driverData[0]);
+			newDriverPrivate->engine = myEngine;
+			
+			/*
+			 * Chech if selected engine supports the drawable.
+			 */ 
+			status = QAEngineCheckDevice(myEngine,&device);
+			
+			if (status != kQANoErr)
+			{
+				AGLSetGLError(aglCtx,AGL_BAD_PIXELFMT,"RAInitialize context: Not valid RAVE Engine!");
+				AGLMemoryDelete( (AGLPtr) newDriverPrivate);
+				return GL_FALSE;
+			}
+		}
+		
+		/*
+		 * Create the draw context.
+		 */
+		 
+		status = QADrawContextNew (&device, &drawableRect,
+				NULL, myEngine , flags, &newDriverPrivate->drawContext);
+		
+		if (status != kQAError)
+		{
+			AGLSetGLError(aglCtx,GL_OUT_OF_MEMORY,"RAInitialize context: Can't initialize RAVE Draw Context!");
+			AGLMemoryDelete( (AGLPtr) newDriverPrivate);
+			return GL_FALSE;
+		} 
+	}
+
+	/*
+	 * Initialize the gl_context
+	 */
+	gl_ctx->DriverCtx = newDriverPrivate;
+	
+	/*
+	 * Do the basic setup for Mesa Ctx.
+	 */
+	 
+	gl_ctx->Driver.Finish = RAFinish;
+  	gl_ctx->Driver.Flush = RAFlush;
+    
+  	gl_ctx->Driver.SetBuffer = RASetBuffer;
+  	gl_ctx->Driver.Clear = RAClear;
+  	gl_ctx->Driver.ClearColor = RAClearColor;
+  	gl_ctx->Driver.Color = RAColor;
+  
+  	gl_ctx->Driver.GetBufferSize = RAGetBufferSize;
+  
+  	gl_ctx->Driver.WriteColorSpan = RAWriteColorSpan; 
+  	gl_ctx->Driver.WriteMonocolorSpan = RAWriteMonocolorSpan;
+  
+  	gl_ctx->Driver.WriteColorPixels = RAWriteColorPixels;
+ 	gl_ctx->Driver.WriteMonocolorPixels = RAWriteMonocolorPixels;
+
+ 	gl_ctx->Driver.ReadColorSpan  = RAReadColorSpanRGB;
+ 	gl_ctx->Driver.ReadColorPixels = RAReadColorPixelRGB;
+  	
+  	gl_ctx->Driver.UpdateState = RAUpdateState;
+	
+	return GL_TRUE;
+}
+
+/************************************************************************************************
+ *
+ * RASwapBuffers: Swap the back buffer to the front.
+ *
+ ***********************************************************************************************/
+
+static GLboolean RASwapBuffers(GLcontext *ctx)
+{
+	/* RAVE Doesn't support this (yet) */
+}
+
+/***************************************************************************************************
+ *
+ * RAUpdateContext: The size or the position changed, so modify the Context.
+ * 					Note that size and pos can be GL_TURE at the same time!
+ *
+ ***************************************************************************************************/
+ 
+extern void gl_SetBufferSize(GLcontext *ctx, const GLint newWidth, const GLint newHeight);
+
+
+static GLboolean RAUpdateContext(  GLcontext *ctx, 						/* Draw Context */
+									const GLboolean posChanged, 		/* Is the pos changed? */
+									const GLboolean sizeChanged )		/* Is the size changed? */
+{
+	/* RAVE Doesn't support this (yet) */
+}
+
+/************************************************************************************************
+ *
+ * RADestroyContext: Delete private draw context data.
+ *
+ ***********************************************************************************************/
+
+static GLboolean RADestroyContext(
+		GLcontext *ctx) 	/* Context data to delete */
+{
+	TRADriverPrivate *myPrivate;
+	
+	myPrivate = (TRADriverPrivate*) ctx->DriverCtx;
+	
+	if (myPrivate->drawContext != NULL)
+	{
+		QADrawContextDelete(myPrivate->drawContext);
+		myPrivate->drawContext = NULL;
+	}
+	
+	AGLMemoryDelete((AGLPtr)myPrivate);
+	
+	ctx->DriverCtx = NULL;
+	
+	return GL_TRUE;
+}
+
+extern GLboolean RAVEGetPixelFmtData(UInt32 inMode, AGLPixelFmt *outPixFmtRec);
+
+/************************************************************************************************
+ * Converts pixelformat to driver mode.
+ * Return GL_TRUE if we can draw to 'device'. For example, this code causes
+ * this driver to be used for only 16 and 32 bit/pixel devices.
+ ***********************************************************************************************/
+
+GLboolean RAVEChooseMode(TAGLPixelFmtReq *inPixFmtReq, 	/* Minimal pixel format */
+							 TDDSpeed *outSpeed,	/* The speed of this driver  */ 
+							 UInt32 *outMode)		/* Mode to be returned */
+{
+	GLboolean	succes;
+	UInt8 		result 		= 0;
+	TAGLPixelFmtReq pixFmtRec 	= *inPixFmtReq;
+	
+	/*
+	 * STEP 1: return GL_FALSE for unsupportted modes.
+	 */
+	
+	if (!pixFmtRec.rgba) {
+	    return GL_FALSE;		/* It supports only rgba pixel formats */
+	}
+	
+	
+	if ((pixFmtRec.redSize > 8) || (pixFmtRec.greenSize >8) || (pixFmtRec.blueSize > 8)) {
+		return GL_FALSE;		/* It supports only max 8 bit color comopnents */
+	}
+	
+	if (pixFmtRec.alphaSize > 8) {
+		return GL_FALSE;		/* It doesn't supports alpha */
+	}
+
+	if (pixFmtRec.stereo) {
+		return GL_FALSE;		/* It doesn't supports stereo */
+	}
+	
+
+	
+	/*
+	 * STEP 2: convert the pixel format to a number (24 bit)
+	 */
+	 
+	succes = DDUGetPixelFmtID(&pixFmtRec,outMode);
+	if (!succes)
+	{
+		return GL_FALSE;
+	} 
+	
+	/*
+	 * STEP 3: See, whatever GL supports this pixel format.
+	 * Note that you should call QDGetPixelFmtData (to be able to
+	 * check the returned pixel format returned by the ID
+	 */
+	RAVEGetPixelFmtData(*outMode,&pixFmtRec);
+	
+	if (!DDUIsGLSupports(&pixFmtRec,&gDriverFT->driverInfo)) {
+		return GL_FALSE;
+	}
+	
+	/*
+	 * STEP 3: set the outSpeed.
+	 */
+	 
+	*outSpeed = 0;
+	
+	/*
+	 * 
+	 */
+	if (!RAVEGetPixelFmtData(*outMode,&pixFmtRec))
+	{
+	  return GL_FALSE;
+	}
+	 
+	return GL_TRUE;
+}
+
+/************************************************************************************************
+ * Converts driver mode to pixel-format.
+ * Return GL_TRUE if inMode is a valid pixel format. 
+ * Returns the format description in outPixFmtRec.
+ ***********************************************************************************************/
+GLboolean RAVEGetPixelFmtData(const UInt32 		inMode, 		/* Mode to be converted */
+							TAGLPixelFmt 		*outPixFmtRec)	/* PixelFormat to be returned */ 
+{
+	/*
+	 * This is the default for most of drivers.
+	 */
+	return DDUGetPixelFmtData(inMode,outPixFmtRec);
+}; 
+
+
+/************************************************************************************************
+ * Create the private draw context data.
+ ***********************************************************************************************/
+static GLboolean RAVEInitializeContext(
+		AGLContext 			aglCtx,			/* Draw context to initialize */
+		const TAGLPixelFmtReq 	*pixFmt,		/* Pixel format */
+		const CGrafPtr  	drawable		/* Target drawable */
+		)
+{
+	TDDUPortSave	 savePort;
+	TQADevice		 myDevice;
+	TQAEngine		 *myEngine;
+	GDHandle		 qdDevice;
+	TQAError		 error;
+	TQARect			 myRect;
+	GDHandle		 gDeviceHandle;
+	TRADriverPrivate *newDriverPrivate;
+	long			 width, height;
+	long			 flags;
+	Rect			 rect;
+	Point			 topLeft;
+	Point			 botRight;
+		
+	__aglAssert(aglCtx);
+	__aglAssert(aglCtx->gl_ctx);
+	
+	
+	/*
+	 * Allocate the TDDDiverPrivate structure.
+	 */
+
+	newDriverPrivate = (TRADriverPrivate *) NewPtrClear ( sizeof( TRADriverPrivate));
+	if (newDriverPrivate == NULL) 
+	{
+		return (GL_FALSE); 
+	};
+	
+	newDriverPrivate->pixFmt = *pixFmt;
+	newDriverPrivate->drawable = drawable;
+	
+	
+	/*
+	 * Initialize the fields that describe the front (drawable) buffer.
+	 */
+	 
+	newDriverPrivate->device = qdDevice = GetGWorldDevice(drawable);
+	newDriverPrivate->deviceRect = drawable->portRect;
+	rect = drawable->portRect;
+	
+	newDriverPrivate->width = width = rect.right - rect.left;
+	newDriverPrivate->height = height = rect.bottom - rect.top;
+	
+	/*
+     * Create the RAVE device (TODO: check, whatever this is an offscreen thing or not).
+	 */
+	
+	gDeviceHandle = GetGWorldDevice(drawable);
+	myDevice.deviceType = kQADeviceGDevice;
+	myDevice.device.gDevice = gDeviceHandle;
+	
+	/*
+	 * Get the RAVE engine. (TODO: Select the best one.)
+	 */
+	myEngine = QADeviceGetFirstEngine(&myDevice);
+	
+	/*
+	 * Convert drawable boundaries to global co-ordinates.
+	 */
+	DDUSetPort(drawable,NULL,&savePort);
+	rect = drawable->portRect;
+	topLeft.h = rect.left;
+	topLeft.v = rect.top;
+	botRight.h = rect.right;
+	botRight.v = rect.bottom;
+	LocalToGlobal (&topLeft);
+	LocalToGlobal (&botRight);
+	DDURestorePort(&savePort);
+	
+	/*
+	 * Create the bound rectangle in device coordinates.
+	 */
+	myRect.left = topLeft.h - (*qdDevice)->gdRect.left;
+	myRect.right = botRight.h - (*qdDevice)->gdRect.left;
+	myRect.top = topLeft.v - (*qdDevice)->gdRect.top;
+	myRect.bottom = botRight.v - (*qdDevice)->gdRect.top;
+	
+	
+	/*
+	 * Set up the context-flag
+	 */
+	 
+	flags = kQAContext_None;
+	if (pixFmt->doubleBuffer)
+	{
+		flags = flags | kQAContext_DoubleBuffer;
+	}
+	
+	if (pixFmt->depthSize == 0)
+	{
+		flags = flags | kQAContext_NoZBuffer;
+	}
+	
+	if (pixFmt->depthSize > 16)
+	{
+		flags = flags | kQAContext_DeepZ; /* TODO: See if the driver has Deep Z buffer */
+	}
+	
+	/*
+	 * Create the RAVE draw context.
+	 */
+	error = QADrawContextNew(&myDevice,&myRect,NULL,myEngine,flags,&newDriverPrivate->drawContext);
+	
+	if (error != kQANoErr)
+	{
+		/* TODO: ERROR */
+		DisposePtr( (Ptr)newDriverPrivate );
+		return NULL;
+	}
+	
+	{
+		PixMap	*devicePixMap;
+		
+		devicePixMap = *(**newDriverPrivate->device).gdPMap;
+		
+		newDriverPrivate->frontPort = drawable;
+		newDriverPrivate->frontRowBytes = devicePixMap->rowBytes & 0x3fff;
+		newDriverPrivate->frontDepth = devicePixMap->pixelSize;
+		newDriverPrivate->frontBaseAddr = devicePixMap->baseAddr
+					+ rect.left * (newDriverPrivate->frontDepth >> 3)
+					+ rect.top * newDriverPrivate->frontRowBytes;
+					
+		/*
+		 * Allocate back buffer if needed:
+		 */
+		 if (pixFmt->doubleBuffer)
+		 {
+		 	newDriverPrivate->backBuffer = DDUCreateBackBuffer(pixFmt->colorDepth,width,height);
+		 	if (newDriverPrivate->backBuffer == NULL) 
+		 	{
+		 		__aglSetGLError(aglCtx,GL_OUT_OF_MEMORY,"QDInitializeContext: There is not enough memory to allocate the back buffer");
+		 	};
+		 } 
+		 else 
+		 {
+		 	newDriverPrivate->backBuffer = NULL;
+		 }
+	}
+	
+	/*
+	 * If a clip region is assigned, copy it into the private data. (TODO )
+	 */
+	 
+	 
+	
+	/*
+	 * Initialize the UpdateState methods and device private pointer, and return.
+	 */
+
+	aglCtx->updateState = RAVEUpdateState;
+	aglCtx->driverPrivate = (TDDDriverPrivate*)newDriverPrivate;
+	
+	/*
+	 * Set the current buffer to front or back buffer:
+	 */
+	RAVEDDSetBuffer(aglCtx->gl_ctx,newDriverPrivate->backBuffer ? GL_BACK : GL_FRONT);
+	
+	return GL_TRUE;
+}
+
+static GLboolean RAVESwapBuffers(AGLContext aglCtx, AGLDrawable drawable)
+{
+	TRADriverPrivate *myPrivate = (TRADriverPrivate*) aglCtx->driverPrivate;
+	TQAError	error;
+	
+	__aglAssert(myPrivate);
+	__aglAssert(myPrivate->backBuffer);
+	
+	if (drawable != myPrivate->frontPort) 
+	{
+		__aglSetAGLError(aglCtx,AGL_BAD_DRAWABLE,"RAVEDriver: drawable doesn't match with the one defined in aglMakeCurrent!");
+		return GL_FALSE;
+	}
+	
+	error = QARenderEnd(myPrivate->drawContext,NULL);
+	
+	if (error != kQANoErr)
+	{
+		__aglSetAGLError(aglCtx,AGL_BAD_DRAWABLE,"RAVEDriver: call to QARenderEnd failed!");
+		return GL_FALSE;
+	}
+	
+	return GL_TRUE;
+}
+
+
+/************************************************************************************************
+ * Delete private draw context data.
+ ***********************************************************************************************/
+static GLboolean RAVEDestroyContext(
+		TDDDriverPrivate *driverPrivate) 	/* Private context data to delete */
+{
+	TRADriverPrivate *myPrivate = (TRADriverPrivate*) driverPrivate;
+	
+	__aglAssert(driverPrivate);
+	
+	QARenderAbort(myPrivate->drawContext);
+	QADrawContextDelete(myPrivate->drawContext);
+	
+	/*
+	 * Dispose Back buffer if exists:
+	 */
+	
+	if (myPrivate->backBuffer != NULL)
+	{
+		DDUDisposeBackBuffer(myPrivate->backBuffer);
+		myPrivate->backBuffer = NULL;
+	}	
+	
+	DisposePtr((Ptr)myPrivate);
+	return GL_TRUE;
+}
+
+/************************************************************************************************
+ * This function is called when the driver has custom color scales. 
+ * The default is 8bit -> 0..255.0, etc...
+ ************************************************************************************************/
+static GLfloat RAVEDDGetColorScale(const int Color,const int bits)
+{
+	/*
+	 * This RAVE driver likes the colors in 0..255.0
+	 */
+	if (bits != 0)
+	{
+		return 255.0;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/***************************************************************************************************
+ * The size or the position changed, so modify the Context.
+ * Note that size and pos can be GL_TURE at the same time!
+ ***************************************************************************************************/
+static GLboolean RAVEDrawableChanged( const AGLContext aglCtx, 
+									const GLboolean posChanged, 		/* Is the pos changed? */
+									const GLboolean sizeChanged )		/* Is the size changed? */
+{
+  TRADriverPrivate *myPrivate = (TRADriverPrivate*) aglCtx->driverPrivate;
+  AGLDrawable drawable = myPrivate->drawable;
+  Rect rect;
+  
+  /* TODO */
+  return GL_TRUE;
+}
+
+/************************************************************************************************
+ * Call this function to register this driver with DD_Managger. This is usually
+ * called by the shared library initialization method. This function returns GL_TURE 
+ * on success, GL_FALSE on error.
+ ***********************************************************************************************/
+GLboolean InstallRAVEDriver()
+{
+	TDDDriverFT *myDriverFT = (TDDDriverFT*)NewPtr(sizeof(TDDDriverFT));
+	
+	if (!gDriverInstalled) {
+		myDriverFT->initializeContext = RAVEInitializeContext;
+		myDriverFT->destroyContext = RAVEDestroyContext;
+		myDriverFT->drawableChanged = RAVEDrawableChanged;
+		myDriverFT->swapBuffers = RAVESwapBuffers;
+		
+		myDriverFT->chooseMode = RAVEChooseMode;
+		myDriverFT->getPixFmtData = RAVEGetPixelFmtData;
+		
+		myDriverFT->driverInfo.supportAlpha = GL_TRUE;
+		myDriverFT->driverInfo.customScales = GL_TRUE;
+		myDriverFT->driverInfo.getColorScale = RAVEDDGetColorScale;
+	}
+	gDriverFT = myDriverFT;
+	
+	return DDRegisterDriver(gDriverFT);
+}
+
+

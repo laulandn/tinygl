@@ -13,7 +13,8 @@
 /* constants */
 #define WIDTH 800
 #define HEIGHT 600
-#define BPP 16
+int BPP=16;
+int FORMAT=SDL_PIXELFORMAT_RGB565;
 
 /* globals */
 ostgl_context_t *ctx;
@@ -47,6 +48,13 @@ int ui_loop(int argc, char **argv, const char *name)
 	/* init sdl */
 	SDL_Init(SDL_INIT_VIDEO);
 
+	/* create sdl context */
+	//window = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ctx->width, ctx->height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
+	window = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
+
+    //FORMAT=SDL_GetWindowPixelFormat(window);
+    //BPP=SDL_BITSPERPIXEL(FORMAT);
+    
 	/* alloc */
 	ctx = ostgl_create_context(w, h, BPP);
 	ostgl_make_current(ctx);
@@ -54,13 +62,13 @@ int ui_loop(int argc, char **argv, const char *name)
 	/* call user functions */
 	init();
 	reshape(ctx->width, ctx->height);
-
-	/* create sdl context */
-	window = SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ctx->width, ctx->height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
-
+	
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 
 	texture = SDL_CreateTexture(renderer, SDL_GetWindowPixelFormat(window), SDL_TEXTUREACCESS_STREAMING, ctx->width, ctx->height);
+
+fprintf(stderr,"FYI SDL_GetWindowPixelFormat=%x\n",SDL_GetWindowPixelFormat(window)); fflush(stderr);
+fprintf(stderr,"FYI FORMAT=%x\n",FORMAT); fflush(stderr);
 
 	SDL_ShowWindow(window);
 
@@ -133,7 +141,7 @@ int ui_loop(int argc, char **argv, const char *name)
 /* swap buffers */
 void swap_buffers(void)
 {
-	SDL_Surface *src = SDL_CreateRGBSurfaceWithFormatFrom(ctx->pixels, ctx->width, ctx->height, ctx->depth, ctx->width * (ctx->depth / 8), SDL_PIXELFORMAT_RGB565);
+	SDL_Surface *src = SDL_CreateRGBSurfaceWithFormatFrom(ctx->pixels, ctx->width, ctx->height, ctx->depth, ctx->width * (ctx->depth / 8), FORMAT);
 	SDL_Surface *dst = SDL_CreateRGBSurfaceWithFormatFrom(NULL, ctx->width, ctx->height, 0, 0, SDL_GetWindowPixelFormat(window));
 
 	if (SDL_LockTexture(texture, NULL, &dst->pixels, &dst->pitch) == 0)
@@ -141,13 +149,19 @@ void swap_buffers(void)
 		if (SDL_BlitSurface(src, NULL, dst, NULL) != 0)
 		{
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "surface blit failed: %s", SDL_GetError());
+            // Panic!
+            SDL_Quit();
+            exit(5);
 		}
 
 		SDL_UnlockTexture(texture);
 	}
 	else
 	{
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "texture lock failed: %s", SDL_GetError());
+	  SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "texture lock failed: %s", SDL_GetError());
+      // Panic!
+      SDL_Quit();
+      exit(5);
 	}
 
 	SDL_FreeSurface(dst);

@@ -1,0 +1,9 @@
+
+all:
+	make -f Makefile.r68 -i -C GLTeapot
+	make -f Makefile.r68 -i -C OpenGL\ for\ PowerPlant
+	
+clean:
+	make -f Makefile.r68 -i -C GLTeapot clean
+	make -f Makefile.r68 -i -C OpenGL\ for\ PowerPlant clean
+	rm -rf */*.o

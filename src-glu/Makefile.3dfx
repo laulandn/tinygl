@@ -1,0 +1,104 @@
+CFLAGS	      = /O2 /D__MSC__ /DFX /DWIN32 /Ic:\mesa-2.3\3dfx\VooDooGLUT \
+		/Ic:\Mesa-2.3\include \
+		/Ic:\3Dfx\glide\src\SST1\include
+
+DEST	      = .
+
+EXTHDRS	      =
+
+HDRS	      = gluP.h \
+		nurbs.h \
+		tess.h
+
+INSTALL	      = cp
+
+LD	      = $(CC)
+
+LDFLAGS	      =
+
+LIBS	      =
+
+MAKEFILE      = Makefile
+
+OBJS	      = glu.obj \
+		mipmap.obj \
+		nurbs.obj \
+		nurbscrv.obj \
+		nurbssrf.obj \
+		nurbsutl.obj \
+		polytest.obj \
+		project.obj \
+		quadric.obj \
+		tess.obj \
+		tesselat.obj
+
+PRINT	      = pr
+
+PROGRAM       = ..\lib\Vglu.lib
+
+SHELL	      = /bin/sh
+
+SRCS	      = glu.c \
+		mipmap.c \
+		nurbs.c \
+		nurbscrv.c \
+		nurbssrf.c \
+		nurbsutl.c \
+		polytest.c \
+		project.c \
+		quadric.c \
+		tess.c \
+		tesselat.c
+
+SYSHDRS	      = /usr/include/_G_config.h \
+		/usr/include/alloca.h \
+		/usr/include/asm/errno.h \
+		/usr/include/assert.h \
+		/usr/include/bytesex.h \
+		/usr/include/endian.h \
+		/usr/include/errno.h \
+		/usr/include/features.h \
+		/usr/include/huge_val.h \
+		/usr/include/i386/ieeefp.h \
+		/usr/include/ieee754.h \
+		/usr/include/ieee854.h \
+		/usr/include/libio.h \
+		/usr/include/linux/errno.h \
+		/usr/include/m68k/__math.h \
+		/usr/include/m68k/ieeefp.h \
+		/usr/include/math.h \
+		/usr/include/nan.h \
+		/usr/include/stdio.h \
+		/usr/include/stdlib.h \
+		/usr/include/string.h \
+		/usr/include/sys/cdefs.h \
+		/usr/include/values.h
+
+all:		$(PROGRAM)
+
+$(PROGRAM):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM) ..."
+		lib  /verbose /OUT:$(PROGRAM) $(OBJS)
+		@echo "done"
+
+clean:;		@rm -f $(OBJS) core
+
+clobber:;	@rm -f $(OBJS) $(PROGRAM) core tags
+
+depend:;	@mkmf -f $(MAKEFILE)
+
+echo:;		@echo $(HDRS) $(SRCS)
+
+index:;		@ctags -wx $(HDRS) $(SRCS)
+
+install:	$(PROGRAM)
+		@echo Installing $(PROGRAM) in $(DEST)
+		@-strip $(PROGRAM)
+		@if [ $(DEST) != . ]; then \
+		(rm -f $(DEST)/$(PROGRAM); $(INSTALL) $(PROGRAM) $(DEST)); fi
+
+print:;		@$(PRINT) $(HDRS) $(SRCS)
+
+tags:           $(HDRS) $(SRCS); @ctags $(HDRS) $(SRCS)
+##########
+

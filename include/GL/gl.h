@@ -672,6 +672,10 @@ enum
 	GL_ALL_ATTRIB_BITS = 0x000fffff
 };
 
+
+typedef unsigned int GLbitfield;
+
+
 /* some types */
 
 typedef int GLenum;
@@ -755,10 +759,12 @@ void glMatrixMode(int mode);
 void glLoadMatrixf(const float *m);
 void glLoadIdentity(void);
 void glMultMatrixf(const float *m);
+void glMultMatrixd(const double *m);
 void glPushMatrix(void);
 void glPopMatrix(void);
 void glRotatef(float angle,float x,float y,float z);
 void glTranslatef(float x,float y,float z);
+void glTranslated(double x,double y,double z);
 void glScalef(float x,float y,float z);
 
 void glViewport(int x,int y,int width,int height);
@@ -794,6 +800,9 @@ void glLoadName(unsigned int name);
 void glGenTextures(int n, unsigned int *textures);
 void glDeleteTextures(int n, const unsigned int *textures);
 void glBindTexture(int target,int texture);
+void glTexImage1D( int target, int level, int components,
+				int width, int border,
+				int format, int type, void *pixels);
 void glTexImage2D( int target, int level, int components,
 				int width, int height, int border,
 				int format, int type, void *pixels);
@@ -818,6 +827,7 @@ void glFlush(void);
 void glHint(int target,int mode);
 void glGetIntegerv(int pname,int *params);
 void glGetFloatv(int pname, float *v);
+void glGetDoublev(int pname, double *v);
 void glFrontFace(int mode);
 
 /* opengl 1.2 arrays */
@@ -859,9 +869,15 @@ inline void glTexParameterf(int, int, int) {};
 /* "new" may or may not be implemented */
 void glPushAttrib(int v);
 void glPopAttrib();
+void glEvalPoint2( GLint i, GLint j );
+void glEvalCoord2f( GLfloat u, GLfloat v );
+void glEvalMesh1( GLenum mode, GLint i1, GLint i2 );
 void glEvalMesh2( GLenum mode, GLint i1, GLint i2, GLint j1, GLint j2 );
+void glMapGrid1f( GLint un, GLfloat u1, GLfloat u2 );
 void glMapGrid2f( GLint un, GLfloat u1, GLfloat u2,
 			 GLint vn, GLfloat v1, GLfloat v2 );
+void glMap1f( GLenum target, GLfloat u1, GLfloat u2, GLint stride,
+		     GLint order, const GLfloat *points );
 void glMap2f( GLenum target,
 		     GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
 		     GLfloat v1, GLfloat v2, GLint vstride, GLint vorder,

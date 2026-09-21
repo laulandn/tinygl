@@ -317,6 +317,17 @@ void glMultMatrixf(const float *m)
   gl_add_op(p);
 }
 
+void glMultMatrixd(const double *m)
+{
+  GLParam p[17];
+  int i;
+
+  p[0].op=OP_MultMatrix;
+  for(i=0;i<16;i++) p[i+1].f=m[i];
+
+  gl_add_op(p);
+}
+
 void glPushMatrix(void)
 {
   GLParam p[1];
@@ -349,6 +360,18 @@ void glRotatef(float angle,float x,float y,float z)
 }
 
 void glTranslatef(float x,float y,float z)
+{
+  GLParam p[4];
+
+  p[0].op=OP_Translate;
+  p[1].f=x;
+  p[2].f=y;
+  p[3].f=z;
+
+  gl_add_op(p);
+}
+
+void glTranslated(double x,double y,double z)
 {
   GLParam p[4];
 

@@ -1,6 +1,8 @@
 
 CC=m68k-apple-macos-gcc
 CXX=m68k-apple-macos-g++
+#CC=powerpc-apple-macos-gcc
+#CXX=powerpc-apple-macos-g++
 
 
 CFLAGS=-I../include -I.. -I$(HOME)/Retro68-build/toolchain/m68k-apple-macos/include/SDL2 -DSTBI_NO_THREAD_LOCALS
@@ -8,10 +10,10 @@ CFLAGS += -I$(HOME)/sdl2macos9/dummy_dir/.
 
 #CFLAGS=-I../../include -I.. -I/opt/local/include/SDL2 -I../../../stb
 
-SDLMAIN= $(HOME)/sdl2macos9/SDL-main/src/main/macosclassic/SDL_main.o
+SDLMAIN= ../../sdl2macos9/SDL-main/src/main/macosclassic/SDL_main.o
 
-LDFLAGS= -L.. $(SDLMAIN) -lSDL2 $(HOME)/sdl2macos9/macos8addons/libmacos8addons.a -lglu -lTinyGL -laglmini -lm 
-#LDFLAGS= -L.. $(SDLMAIN) -lSDL2 $(HOME)/sdl2macos9/macos8addons/libmacos8addons.a $(HOME)/sdl2macos9/dummy_dir/*.o -lOpenGLUtility -lOpenGLLibrary -lglmui -lm 
+LDFLAGS= -L.. $(SDLMAIN) -lSDL2 ../../sdl2macos9/macos8addons/libmacos8addons.a
+LDFLAGS+= -lglu -lTinyGL -laglmini -lm
 #LDFLAGS=-L../../lib -lTinyGL -L/opt/local/lib -lSDL2
 
 
@@ -22,37 +24,34 @@ LDFLAGS= -L.. $(SDLMAIN) -lSDL2 $(HOME)/sdl2macos9/macos8addons/libmacos8addons.
 
 all:	bounce cube gears mech morph3d spin teapot
 
-browser:	browser.o ui_sdl2.o
-	$(CC) -o browser.code.bin browser.o ui_sdl2.o $(LDFLAGS) 
-	$(HOME)/sdl2macos9/bin2app.sh browser
 
 bounce:	bounce.o ui_sdl2.o
 	$(CC) -o bounce.code.bin bounce.o ui_sdl2.o $(LDFLAGS) 
-	$(HOME)/sdl2macos9/bin2app.sh bounce
+	../bin2app.sh bounce
 
 cube:	cube.o
 	$(CC) -o cube.code.bin cube.o ui_sdl2.o $(LDFLAGS)
-	$(HOME)/sdl2macos9/bin2app.sh cube
+	../bin2app.sh cube
 
 gears:	gears.o
 	$(CC) -o gears.code.bin gears.o ui_sdl2.o $(LDFLAGS)
-	$(HOME)/sdl2macos9/bin2app.sh gears
+	../bin2app.sh gears
 
 mech:	mech.o
 	$(CC) -o mech.code.bin mech.o ui_sdl2.o $(LDFLAGS)
-	$(HOME)/sdl2macos9/bin2app.sh mech
+	../bin2app.sh mech
 
 morph3d:	morph3d.o
 	$(CC) -o morph3d.code.bin morph3d.o ui_sdl2.o $(LDFLAGS)
-	$(HOME)/sdl2macos9/bin2app.sh morph3d
+	../bin2app.sh morph3d
 
 spin:	spin.o
 	$(CC) -o spin.code.bin spin.o ui_sdl2.o $(LDFLAGS)
-	$(HOME)/sdl2macos9/bin2app.sh spin
+	../bin2app.sh spin
 
 teapot:	teapot.o
 	$(CC) -o teapot.code.bin teapot.o ui_sdl2.o $(LDFLAGS)
-	$(HOME)/sdl2macos9/bin2app.sh teapot
+	../bin2app.sh teapot
 
 
 clean:

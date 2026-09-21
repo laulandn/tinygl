@@ -4,26 +4,31 @@ all:
 #	( for f in $(DIRS); do ( cd $$f ; make -f Makefile.r68 all ) || exit 1 ; done )
 	make  -C source -f Makefile.r68
 	make  -C agl-mini -f Makefile.r68
+	make  -C agl-soft -f Makefile.r68
 	make  -C GLUT_apple -f Makefile.r68
+	make  -C src-glu -f Makefile.r68
 	cp */*.a .
 	make  -C examples -f Makefile.r68
-	$(AR) rcv libOpenGLLibrary.a source/*.o agl-mini/*.o
-	$(RANLIB) libOpenGLLibrary.a
-	$(AR) rcv libOpenGLUtility.a src-glu/*.o
-	$(RANLIB) libOpenGLUtility.a
+	$(AR) rcv libMesaOpenGLLibrary.a source/*.o agl-mini/*.o
+	$(RANLIB) libMesaOpenGLLibrary.a
+	$(AR) rcv libMesaOpenGLUtility.a src-glu/*.o
+	$(RANLIB) libMesaOpenGLUtility.a
 
 install:
 	make -f Makefile.r68 all
 	# NOTE: Do NOT copy the include files!
-	cp *.a $(HOME)/Retro68-build/toolchain/m68k-apple-macos/lib/.
+	cp libglu.a libglut.a libMesaOpenGLLibrary.a libMesaOpenGLUtility.a $(HOME)/Retro68-build/toolchain/powerpc-apple-macos/lib/.
 	
 clean:
 	rm -f *~ lib/libTinyGL.a include/GL/*~ TAGS
 #	( for f in $(DIRS); do ( cd $$f ; make -f Makefile.r68 clean ; ) done )
 	make  -C source -f Makefile.r68 clean
 	make  -C examples -f Makefile.r68 clean
+	make  -C MesaExamples -f Makefile.r68 clean
 	make  -C agl-mini -f Makefile.r68 clean
+	make  -C agl-soft -f Makefile.r68 clean
 	make  -C GLUT_apple -f Makefile.r68 clean
+	make  -C src-glu -f Makefile.r68 clean
 	rm -rf *.a
 
 install:

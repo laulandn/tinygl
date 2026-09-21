@@ -15,6 +15,8 @@
 #define WIDTH 800
 #define HEIGHT 600
 #define BPP 16
+//#define FORMAT SDL_PIXELFORMAT_RGB565
+#define FORMAT SDL_PIXELFORMAT_INDEX8
 
 /* globals */
 ostgl_context_t *ctx;
@@ -127,7 +129,7 @@ int ui_loop(int argc, char **argv, const char *name)
 /* swap buffers */
 void swap_buffers(void)
 {
-	SDL_Surface *src = SDL_CreateSurfaceFrom(ctx->width, ctx->height, SDL_PIXELFORMAT_RGB565, ctx->pixels, ctx->width * (ctx->depth / 8));
+	SDL_Surface *src = SDL_CreateSurfaceFrom(ctx->width, ctx->height, FORMAT, ctx->pixels, ctx->width * (ctx->depth / 8));
 	SDL_Surface *dst = SDL_CreateSurfaceFrom(ctx->width, ctx->height, SDL_GetWindowPixelFormat(window), NULL, 0);
 
 	if (SDL_LockTexture(texture, NULL, &dst->pixels, &dst->pitch))
@@ -135,6 +137,9 @@ void swap_buffers(void)
 		if (!SDL_BlitSurface(src, NULL, dst, NULL))
 		{
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "surface blit failed: %s", SDL_GetError());
+            // Panic!
+            SDL_Quit();
+            exit(5);
 		}
 
 		SDL_UnlockTexture(texture);
@@ -142,6 +147,9 @@ void swap_buffers(void)
 	else
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "texture lock failed: %s", SDL_GetError());
+      // Panic!
+      SDL_Quit();
+      exit(5);
 	}
 
 	SDL_DestroySurface(dst);
