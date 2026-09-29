@@ -44,7 +44,7 @@ GLboolean aglDescribePixelFormat(struct __AGLPixelFormatRec *fmt,GLint what,GLin
       return true;
       break;
     case AGL_PIXEL_SIZE:
-      *value=aglTheScreenDepth;
+      *value=aglTheRenderDepth;
       return true;
       break;
     default:

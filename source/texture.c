@@ -135,7 +135,7 @@ void glopTexImage2D(GLContext *c,GLParam *p)
   GLImage *im;
   unsigned char *pixels1;
   int do_free;
-  int internalFormat=components;
+  //int internalFormat=components;
   int theSize;
   
   components=3;

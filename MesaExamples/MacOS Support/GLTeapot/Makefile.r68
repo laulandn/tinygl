@@ -5,7 +5,7 @@ CXX=m68k-apple-macos-g++
 #CXX=powerpc-apple-macos-g++
 
 CFLAGS= -I../../../Headers -I../OpenGL\ for\ PowerPlant
-LDFLAGS=-lglut -lOpenGLUtility -lOpenGLLibrary -lm
+LDFLAGS=-L../../.. -lglut -lOpenGLUtility -lOpenGLLibrary -lm
 
 OBJS=$(subst .c,.o,$(wildcard *.c)) $(subst .cpp,.o,$(wildcard *.cpp))
 

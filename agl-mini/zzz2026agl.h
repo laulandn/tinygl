@@ -51,7 +51,9 @@ extern char *osBuffer;
 extern OSGLContext osContext;
 extern int aglTheError;
 
-extern int aglTheScreenDepth;  // TODO: This should be current depth
+extern int aglTheScreenDepth;
+extern int aglTheRenderDepth;
+
 extern int aglWinSizeX,aglWinSizeY;  // TODO: This should be current size
 
 // This is needed, so we'll have to get it somehow...

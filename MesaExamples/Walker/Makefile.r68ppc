@@ -5,7 +5,7 @@ CC=powerpc-apple-macos-gcc
 CXX=powerpc-apple-macos-g++
 
 CFLAGS= -I../../Headers -Dmacintosh
-LDFLAGS=-lglut -lMesaOpenGLUtility -lMesaOpenGLLibrary -lm
+LDFLAGS=-L../.. -lglut -lTinyOpenGLUtility -lTinyOpenGLLibrary -lm
 
 OBJS=$(subst .c,.o,$(wildcard *.c)) $(subst .cpp,.o,$(wildcard *.cpp))
 

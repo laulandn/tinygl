@@ -20,6 +20,8 @@ int aglTheError=0;
 
 // NOTE: TinyGL doesn't seem to like 32 bit pixels...
 int aglTheScreenDepth=16;  // TODO: This should be current depth
+int aglTheRenderDepth=16;  // TODO: This will be render target
+
 int aglWinSizeX=640,aglWinSizeY=480;  // TODO: This should be current size
 
 

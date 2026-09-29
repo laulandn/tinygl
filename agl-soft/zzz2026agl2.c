@@ -44,7 +44,7 @@ GLboolean aglDescribePixelFormat(struct __AGLPixelFormatRec *fmt,GLint what,GLin
       return true;
       break;
     case AGL_PIXEL_SIZE:
-      *value=aglTheScreenDepth;
+      *value=aglTheRenderDepth;
       return true;
       break;
     default:
@@ -168,39 +168,49 @@ const GLubyte *aglErrorString(GLenum code)
   if (code)
     switch (code)
     {
+#ifdef AGL_GL_ERROR
       case AGL_GL_ERROR:
         return (const GLubyte *)"AGL_GL_ERROR";
         break;
+#endif
       case AGL_BAD_ATTRIBUTE:
         return (const GLubyte *)"AGL_BAD_ATTRIBUTE";
         break;
       case AGL_BAD_PIXELFMT:
         return (const GLubyte *)"AGL_BAD_PIXELFMT";
         break;
-     /* case AGL_INVALID_OPT:
-        return (const GLubyte *)"AGL_INVALID_OPT";
-        break; */
-      //
-      case AGL_BAD_CONTEXT:
-        return (const GLubyte *)"AGL_BAD_CONTEXT";
-        break;
-        // duplicate?
-      /*case AGL_INVALID_GDEV:
-        return (const GLubyte *)"AGL_INVALID_GDEV";
-        break;*/
-      //
       case AGL_BAD_DRAWABLE:
         return (const GLubyte *)"AGL_BAD_DRAWABLE";
         break;
-      /* case AGL_NOT_RENDERING:
+#ifdef AGL_INVALID_OPT
+      case AGL_INVALID_OPT:
+        return (const GLubyte *)"AGL_INVALID_OPT";
+        break;
+#endif
+      case AGL_BAD_CONTEXT:
+        return (const GLubyte *)"AGL_BAD_CONTEXT";
+        break;
+#ifdef AGL_INVALID_GDEV
+      // duplicate?
+      /*case AGL_INVALID_GDEV:
+        return (const GLubyte *)"AGL_INVALID_GDEV";
+        break;*/
+#endif
+#ifdef AGL_NOT_RENDERING
+      case AGL_NOT_RENDERING:
         return (const GLubyte *)"AGL_NOT_RENDERING";
-        break; */
-      /* case AGL_DO_ALREADY:
+        break;
+#endif
+#ifdef AGL_DO_ALREADY
+      case AGL_DO_ALREADY:
         return (const GLubyte *)"AGL_DO_ALREADY";
-        break; */
-      /* case AGL_ATTRIB_UNAVAIL:
+        break;
+#endif
+#ifdef AGL_ATTRIB_UNAVAIL
+      case AGL_ATTRIB_UNAVAIL:
         return (const GLubyte *)"AGL_ATTRIB_UNAVAIL";
-        break; */
+        break;
+#endif
       default:
         return (const GLubyte *)"Unknown error.";
         break;

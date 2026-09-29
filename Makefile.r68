@@ -9,10 +9,10 @@ all:
 	make  -C src-glu -f Makefile.r68
 	cp */*.a .
 	make  -C examples -f Makefile.r68
-	$(AR) rcv libMesaOpenGLLibrary.a source/*.o agl-mini/*.o
-	$(RANLIB) libMesaOpenGLLibrary.a
-	$(AR) rcv libMesaOpenGLUtility.a src-glu/*.o
-	$(RANLIB) libMesaOpenGLUtility.a
+	$(AR) rcv libTinyOpenGLLibrary.a source/*.o agl-mini/*.o
+	$(RANLIB) libTinyOpenGLLibrary.a
+	$(AR) rcv libTinyOpenGLUtility.a src-glu/*.o
+	$(RANLIB) libTinyOpenGLUtility.a
 
 install:
 	make -f Makefile.r68 all
