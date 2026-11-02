@@ -8,6 +8,14 @@
 #include "zzz2026agl.h"
 
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+
 extern int pixelSizeTheyAskedFor;
 extern int depthSizeTheyAskedFor;
 extern int stencilSizeTheyAskedFor;
@@ -21,38 +29,38 @@ GLboolean aglDescribePixelFormat(struct __AGLPixelFormatRec *fmt,GLint what,GLin
   switch(what) {
     case AGL_RGBA:
       *value=1;
-      return true;
+      return TRUE;
       break;
     case AGL_ACCELERATED:
-      *value=true;
-      return true;
+      *value=TRUE;
+      return TRUE;
       break;
     case AGL_RENDERER_ID:
       *value=1;
-      return true;
+      return TRUE;
       break;
     case AGL_DEPTH_SIZE:
       *value=20;
-      return true;
+      return TRUE;
       break;
     case AGL_STENCIL_SIZE:
       *value=20;
-      return true;
+      return TRUE;
       break;
     case AGL_DOUBLEBUFFER:
-      *value=true;
-      return true;
+      *value=TRUE;
+      return TRUE;
       break;
     case AGL_PIXEL_SIZE:
       *value=aglTheRenderDepth;
-      return true;
+      return TRUE;
       break;
     default:
       fprintf(stderr,"aglDescribePixelFormat...what=%d implemented\n",what); fflush(stderr);
-      return false;
+      return FALSE;
       break;
   }
-  return false;
+  return FALSE;
 }
 */
 
@@ -60,7 +68,7 @@ GLboolean aglDescribePixelFormat(struct __AGLPixelFormatRec *fmt,GLint what,GLin
 GLboolean aglDescribePixelFormat(AGLPixelFormat pix, GLint attrib,
                                         GLint *value)
 {
-  GLboolean ret=false;
+  GLboolean ret=FALSE;
 #ifdef DEBUG
 fprintf(stderr,"Called my aglDescribePixelFormat...\n"); fflush(stderr);
 #endif
@@ -68,50 +76,50 @@ fprintf(stderr,"Called my aglDescribePixelFormat...\n"); fflush(stderr);
     case AGL_RGBA:
       /* Of COURSE we are rgba..right? */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_RGBA, we are lying...\n"); fflush(stderr);
-      *value=true;
-      ret=true;
+      *value=TRUE;
+      ret=TRUE;
       break;
     case AGL_ACCELERATED:
       /* Of COURSE we are accelerated..right? */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_ACCELERATED, we are lying...\n"); fflush(stderr);
-      *value=true;
-      ret=true;
+      *value=TRUE;
+      ret=TRUE;
       break;
     case AGL_FULLSCREEN:
       /* No!  No fullscreen for us! */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_FULLSCREEN, we are lying...\n"); fflush(stderr);
-      *value=false;
-      ret=true;
+      *value=FALSE;
+      ret=TRUE;
       break;
     case AGL_RENDERER_ID:
       /* Um...1? */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_RENDERER_ID, we are making one up...\n"); fflush(stderr);
       *value=1;
-      ret=true;
+      ret=TRUE;
       break;
     case AGL_DEPTH_SIZE:
       /* We return what they asked for, possibly lying.  If they didn't ask, 16 */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_DEPTH_SIZE, we are lying...\n"); fflush(stderr);
       *value=depthSizeTheyAskedFor;
-      ret=true;
+      ret=TRUE;
       break;
     case AGL_PIXEL_SIZE:
       /* We return what they asked for, possibly lying.  If they didn't ask, 16 */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_PIXEL_SIZE, we are lying...\n"); fflush(stderr);
       *value=pixelSizeTheyAskedFor;
-      ret=true;
+      ret=TRUE;
       break;
     case AGL_STENCIL_SIZE:
       /* We return what they asked for, possibly lying.  If they didn't ask, 16 */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_STENCIL_SIZE, we are lying...\n"); fflush(stderr);
       *value=stencilSizeTheyAskedFor;
-      ret=true;
+      ret=TRUE;
       break;
     case AGL_DOUBLEBUFFER:
       /* Of COURSE we are double buffered...right? */
       fprintf(stderr,"aglDescribePixelFormat asked about AGL_DOUBLEBUFFER, are we lying?\n"); fflush(stderr);
-      *value=true;
-      ret=true;
+      *value=TRUE;
+      ret=TRUE;
       break;
     default:
       fprintf(stderr,"aglDescribePixelFormat %d %d ...not implemented\n",(int)pix,(int)attrib); fflush(stderr);
@@ -148,7 +156,7 @@ GLboolean aglDescribeRenderer(AGLRendererInfo rend, GLint prop, GLint *value)
       fprintf(stderr,"aglDescribeRenderer %d...not implemented\n",prop); fflush(stderr);
       break;
   }
-  return false;
+  return FALSE;
 }
 
 
@@ -159,7 +167,7 @@ GLboolean aglConfigure(GLenum whats, GLuint value)
       fprintf(stderr,"aglConfigure %d...not implemented\n",whats); fflush(stderr);
       break;
   }
-  return false;
+  return FALSE;
 }
 
 
@@ -224,7 +232,7 @@ GLboolean aglUpdateContext(AGLContext ctx)
   //fprintf(stderr,"aglUpdateContext...not implemented\n"); fflush(stderr);
   // We ignore...we only support a single static context...
   // ...but maybe we should do something here if win size changed?
-  return true;
+  return TRUE;
 }
 
 
@@ -245,7 +253,7 @@ fprintf(stderr,"Called my aglSetInteger...\n"); fflush(stderr);
       fprintf(stderr,"aglSetInteger pname=%d...not implemented\n",(int)pname); fflush(stderr);
       break;
   }
-  return true;
+  return TRUE;
 }
 
 
@@ -256,7 +264,7 @@ GLboolean aglDisable(AGLContext ctx, GLenum pname)
       fprintf(stderr,"aglDisable %d...not implemented\n",pname); fflush(stderr);
       break;
   }
-  return true;
+  return TRUE;
 }
 
 
@@ -265,7 +273,7 @@ GLboolean aglSetOffScreen(AGLContext ctx, int w, int h, int rowbytes, void *base
   fprintf(stderr,"aglSetOffScreen %d x %d rowbytes=%d...not implemented\n",w,h,rowbytes); fflush(stderr);
   // TODO: Maybe resize window here?
   // Can we use rowbytes and baseaddr?  How?
-  return true;
+  return TRUE;
 }
 
 
@@ -273,5 +281,5 @@ GLboolean aglSetFullScreen(AGLContext ctx, int w, int h, int freq, int dev)
 {
   fprintf(stderr,"aglSetFullScreen %d x %d and %d and %d...not implemented\n",w,h,freq,dev); fflush(stderr);
   // TODO: Maybe resize window here?
-  return true;
+  return TRUE;
 }

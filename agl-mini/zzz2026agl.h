@@ -57,6 +57,7 @@ extern int aglTheRenderDepth;
 extern int aglWinSizeX,aglWinSizeY;  // TODO: This should be current size
 
 // This is needed, so we'll have to get it somehow...
+//NOTE: The exact type may vary, depending on SDL, etc.
 extern void *theOnlyLonelyWindow;
 
 

@@ -9,21 +9,25 @@ CXX=powerpc-apple-macos-g++
 AR=powerpc-apple-macos-ar
 RANLIB=powerpc-apple-macos-ranlib
 
-CFLAGS= -I. -I../include -I../include/GL -Dmacintosh -DSDL_MACOSCLASSIC_TINYGL=1
 
-CFLAGS+= -DUSING_SDL2
+CFLAGS= -I. -I../include -I../include/GL -Dmacintosh
+
+CFLAGS+= -DSDL_MACOSCLASSIC_TINYGL=1
+#CFLAGS+= -DUSING_SDL2
+CFLAGS+=-DNO_COLOR_QUICKDRAW=1
+
 
 OBJS=$(subst .c,.o,$(wildcard *.c))
+
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 
-lib: $(OBJS)
-	$(AR) rcv lib$(LIBNAME).a $(OBJS)
-	$(RANLIB) lib$(LIBNAME).a
-
 all: $(OBJS)
+	rm -f *.a
+	$(AR) rcv lib$(LIBNAME).a $(OBJS)
+	$(RANLIB) lib$(LIBNAME).a	
 
 clean:
 	rm -f *.o */*.o *.a

@@ -883,7 +883,6 @@ void glMap2f( GLenum target,
 		     GLfloat v1, GLfloat v2, GLint vstride, GLint vorder,
 		     const GLfloat *points );
 
-
 /* non compatible functions */
 void glDebug(int mode);
 void glInit(void *zbuffer);

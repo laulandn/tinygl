@@ -546,8 +546,8 @@ int main ( int argc, char** argv )
 {
   int i;
 
-  freopen ("stdout.txt", "w", stdout);
-  freopen ("stderr.txt", "w", stdout);
+  freopen("stdout.txt", "w", stdout);
+  freopen("stderr.txt", "w", stderr);
 
   glutInitWindowSize	( 400, 600 ) ;
   glutInit(&argc, argv);

@@ -5,7 +5,7 @@ CXX=m68k-apple-macos-g++
 #CXX=powerpc-apple-macos-g++
 
 CFLAGS= -I../../include
-LDFLAGS=-L../.. -lglut -lOpenGLUtility -lOpenGLLibrary -lm
+LDFLAGS=-L../.. -lglut -lTinyOpenGLUtility -lTinyOpenGLLibrary -lm
 
 OBJS=$(subst .c,.o,$(wildcard *.c)) $(subst .cpp,.o,$(wildcard *.cpp))
 

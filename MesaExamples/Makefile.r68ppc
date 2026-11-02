@@ -1,13 +1,13 @@
 
 all:
-	make -f Makefile.r68ppc -C Chess
-	make -f Makefile.r68ppc -C Geoface
+#	make -f Makefile.r68ppc -C Chess
+#	make -f Makefile.r68ppc -C Geoface
 	make -f Makefile.r68ppc -C Glutmech
-	make -f Makefile.r68ppc -C Ideas
+#	make -f Makefile.r68ppc -C Ideas
 	make -f Makefile.r68ppc -C OpenGL\ logo
-	make -f Makefile.r68ppc -C Rollercoaster
-	make -f Makefile.r68ppc -C UnderWater
-	make -f Makefile.r68ppc -C Walker
+#	make -f Makefile.r68ppc -C Rollercoaster
+#	make -f Makefile.r68ppc -C UnderWater
+#	make -f Makefile.r68ppc -C Walker
 	make -f Makefile.r68ppc -C Sample
 	
 clean:

@@ -1,0 +1,31 @@
+LIBNAME=aglsoft
+
+#CC=m68k-apple-macos-gcc
+#CXX=m68k-apple-macos-g++
+#AR=m68k-apple-macos-ar
+#RANLIB=m68k-apple-macos-ranlib
+#CC=powerpc-apple-macos-gcc
+#CXX=powerpc-apple-macos-g++
+#AR=powerpc-apple-macos-ar
+RANLIB=ranlib
+
+
+CFLAGS= -I. -I../include -I../include/GL
+CFLAGS+=-DNO_COLOR_QUICKDRAW=1
+
+
+OBJS=$(subst .c,.o,$(wildcard *.c))
+
+
+.c.o:
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+
+all: $(OBJS)
+	make -f Makefile -C aglDD
+	$(AR) rcv lib$(LIBNAME).a *.o */*.o
+	$(RANLIB) lib$(LIBNAME).a
+
+clean:
+	make -f Makefile.r68 -C aglDD clean
+	rm -f *.o */*.o *.a

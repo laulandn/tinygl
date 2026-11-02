@@ -13,6 +13,7 @@ CFLAGS= -I.. -I../../include -I../../include/GL
 
 OBJS=$(subst .c,.o,$(wildcard *.c))
 
+
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
 

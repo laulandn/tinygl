@@ -8,6 +8,14 @@
 #include "zzz2026agl.h"
 
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+
 // This should be kept in sync with Mesa 2.4.1's AGL additions, as much as possible...
 
 
@@ -19,7 +27,7 @@ OSGLContext osContext=NULL;
 int aglTheError=0;
 
 // NOTE: TinyGL doesn't seem to like 32 bit pixels...
-int aglTheScreenDepth=16;  // TODO: This should be current depth
+int aglTheScreenDepth=1;  // TODO: This should be current depth
 int aglTheRenderDepth=16;  // TODO: This will be render target
 
 int aglWinSizeX=640,aglWinSizeY=480;  // TODO: This should be current size
@@ -27,7 +35,7 @@ int aglWinSizeX=640,aglWinSizeY=480;  // TODO: This should be current size
 
 #ifndef USING_SDL1
 #ifndef USING_SDL2
-void *theOnlyLonelyWindow=NULL;
+void *theOnlyLonelyWindow;
 #endif
 #endif
 
@@ -44,7 +52,7 @@ GLenum aglGetError()
 }
 
 
-struct __AGLPixelFormatRec *aglChoosePixelFormat(GDevice ** const *gdevs, GLint ndev, const GLint *v)
+struct __AGLPixelFormatRec *aglChoosePixelFormat(const AGLDevice *gdevs, GLint ndev, const GLint *v)
 {
   fprintf(stderr,"fake aglChoosePixelFormat!\n"); fflush(stderr);
   return (struct __AGLPixelFormatRec *)aglThePixelFormatPtr;
@@ -63,20 +71,20 @@ GLboolean aglSetDrawable(AGLContext ctx, AGLDrawable draw)
 #ifndef USING_SDL1
 #ifndef USING_SDL2
   if(!draw) {
-    fprintf(stderr,"draw was NULL!\n"); fflush(stderr); return false;
+    fprintf(stderr,"draw was NULL!\n"); fflush(stderr); return FALSE;
   }
   theOnlyLonelyWindow=(void *)draw;
   fprintf(stderr,"FYI theOnlyLonelyWindow is now %x\n",theOnlyLonelyWindow); fflush(stderr);
 #endif
 #endif
-  return true;
+  return TRUE;
 }
 
 
 GLboolean aglSetCurrentContext(AGLContext ctx)
 {
   // We ignore...we only support a single static context...
-  return true;
+  return TRUE;
 }
 
 
@@ -87,7 +95,7 @@ GLboolean aglDestroyContext(AGLContext ctx)
 #else
   // TODO: Destroy mesa os context here
 #endif
-  return true;
+  return TRUE;
 }
 
 

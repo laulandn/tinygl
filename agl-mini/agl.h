@@ -9,7 +9,9 @@
 #ifndef _AGL_H
 #define _AGL_H
 
+#ifdef macintosh
 #include <Quickdraw.h>
+#endif
 #include "gl.h"
 #include "glext.h"
 
@@ -26,12 +28,24 @@ extern "C" {
 /*
 ** Macintosh device type.
 */
+#ifdef macintosh
 typedef GDHandle AGLDevice;
+#else
+typedef void * AGLDevice;
+#endif
 
 /*
 ** Macintosh drawable type.
 */
+#ifdef macintosh
 typedef CGrafPtr AGLDrawable;
+#else
+typedef void * AGLDrawable;
+#endif
+
+#ifndef macintosh
+typedef int Style;
+#endif
 
 /*
 ** AGL opaque data.

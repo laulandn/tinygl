@@ -9,9 +9,13 @@ RANLIB=m68k-apple-macos-ranlib
 #AR=powerpc-apple-macos-ar
 #RANLIB=powerpc-apple-macos-ranlib
 
+
 CFLAGS= -I. -I../include -I../include/GL
+CFLAGS+=-DNO_COLOR_QUICKDRAW=1
+
 
 OBJS=$(subst .c,.o,$(wildcard *.c))
+
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<

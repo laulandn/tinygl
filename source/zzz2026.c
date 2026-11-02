@@ -8,6 +8,11 @@
 #endif
 
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+
 typedef float		GLclampf;	/* single precision float in [0,1] */
 
 
@@ -608,43 +613,43 @@ void glDepthFunc( GLenum func )
 }
 
 
-void glDepthMask(int)
+void glDepthMask(int i1)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
 }
 
 
-void glFogi(int, int)
+void glFogi(int i1, int i2)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
 }
 
 
-void glFogfv(int, const float*)
+void glFogfv(int i1, const float *f1)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
 }
 
 
-void glFogf(int, float)
+void glFogf(int i1, float f1)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
 }
 
 
-void glRasterPos2f(float, float)
+void glRasterPos2f(float f1, float f2)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
 }
 
 
-void glPolygonStipple(void*)
+void glPolygonStipple(void *v1)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
 }
 
 
-void glTexParameterf(int, int, int)
+void glTexParameterf(int i1, int i2, int i3)
 {
   fprintf(stderr,"glDepthFunc...not implemented\n"); fflush(stderr);
 }
@@ -756,6 +761,6 @@ GLboolean OSMesaMakeCurrent( OSMesaContext ctx,
   // Too late we get the real size!
   // And already have the pixels...sigh...
   fprintf(stderr,"Fake OSMesaMakeCurrent...don't use this!!!\n"); fflush(stderr);
-  return true;
+  return TRUE;
 }
 

@@ -6,14 +6,14 @@ CXX=m68k-apple-macos-g++
 
 
 CFLAGS=-I../include -I.. -I$(HOME)/Retro68-build/toolchain/m68k-apple-macos/include/SDL2 -DSTBI_NO_THREAD_LOCALS
-CFLAGS += -I$(HOME)/sdl2macos9/dummy_dir/.
+#CFLAGS += -I$(HOME)/sdl2macos9/dummy_dir/.
 
 #CFLAGS=-I../../include -I.. -I/opt/local/include/SDL2 -I../../../stb
 
 SDLMAIN= ../../sdl2macos9/SDL-main/src/main/macosclassic/SDL_main.o
 
 LDFLAGS= -L.. $(SDLMAIN) -lSDL2 ../../sdl2macos9/macos8addons/libmacos8addons.a
-LDFLAGS+= -lglu -lTinyGL -laglmini -lm
+LDFLAGS+= -lglu -lTinyGL -laglminisdl2 -lm
 #LDFLAGS=-L../../lib -lTinyGL -L/opt/local/lib -lSDL2
 
 
@@ -56,4 +56,3 @@ teapot:	teapot.o
 
 clean:
 	rm -rf bounce cube gears mech morph3d spin teapot *.o *.APPL *.bin *.gdb *.dsk *.pef
-

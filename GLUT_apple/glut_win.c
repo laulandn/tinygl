@@ -380,13 +380,24 @@ GLUTwindow *__glutCreateWindow(GLUTwindow *parent, const char *title, int x, int
 	
 	aglDescribePixelFormat(window->vis, AGL_FULLSCREEN, &value);
 	window->fullscreen = value;
-	
+
+  if(window->fullscreen) {
+    fprintf(stderr,"FYI __glutCreateWindow trying fullscreen...\n"); fflush(stderr);  
+  }
+  else {
+    fprintf(stderr,"FYI __glutCreateWindow NOT trying fullscreen...\n"); fflush(stderr);  
+  }
+  
 	aglDescribePixelFormat(window->vis, AGL_RGBA, &value);
 	if(!value) aglDisable(window->ctx, AGL_COLORMAP_TRACKING);
 
 	if(!window->fullscreen)
 	{
+#ifdef NO_COLOR_QUICKDRAW
+		window->win = (CWindowPtr) GetNewWindow(win_type,nil,(WindowPtr)-1L);
+#else
 		window->win = (CWindowPtr) GetNewCWindow(win_type,nil,(WindowPtr)-1L);
+#endif
 		if(!window->win)
 		{
 			__glutFatalError("window could not be created.");
@@ -404,6 +415,15 @@ GLUTwindow *__glutCreateWindow(GLUTwindow *parent, const char *title, int x, int
 			__glutCToStr255("GLUT Window", ps);
 			SetWTitle((GrafPort *) window->win, ps);
 		}
+
+    if ((height+y) > (qd.screenBits.bounds.bottom - qd.screenBits.bounds.top)) {
+        height = (short)(qd.screenBits.bounds.bottom - qd.screenBits.bounds.top);
+        y=0;
+    }
+    if ((width+x) > (qd.screenBits.bounds.right - qd.screenBits.bounds.left)) {
+        width = (short)(qd.screenBits.bounds.right - qd.screenBits.bounds.left);
+        x=0;
+    }
 
 		MoveWindow((GrafPort *) window->win, x, y, GL_FALSE);
 		SizeWindow((GrafPort *) window->win, width, height,GL_FALSE);
